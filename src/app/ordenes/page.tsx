@@ -159,7 +159,7 @@ export default async function OrdenesPage({ searchParams }: any) {
                   }}
                 >
                   {/* 💳 CRÉDITO */}
-                  {o.deuda > 0 && (
+                  {(o.deuda || 0) > 0 && (
                     <div
                       title="Cliente con deuda"
                       style={{
