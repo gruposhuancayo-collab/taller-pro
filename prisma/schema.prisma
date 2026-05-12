@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model cliente {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  dni      String
+  celular  String
+
+  ordenes  orden[]
+}
+
+model orden {
+  id        Int     @id @default(autoincrement())
+  codigo    String
+
+  producto  String
+  marca     String
+  modelo    String?
+  serie     String?
+  problema  String
+
+  estado    String
+
+  // 🔧 reparación
+  reparacion String?
+  precio     Float?
+  tipoPago   String?
+  motivoNoReparado String?
+  enGarantia Boolean @default(false)
+
+  // 🆕 FECHAS DE GARANTÍA
+  fechaIngreso  DateTime @default(now()) // cuando entra el equipo
+  fechaGarantia DateTime?               // cuando se reparó (inicio garantía)
+
+  // 💳 crédito
+  deuda      Float? @default(0)
+
+  // ✅ FECHA DE PAGO
+  fechaPago  DateTime?
+
+  // 🧾 recibo
+  recibo     Int? @default(0)
+
+  // 📸 FOTOS DEL EQUIPO
+  fotos      String[] @default([])
+
+  // ⏱ FECHAS
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  clienteId Int
+  cliente   cliente @relation(fields: [clienteId], references: [id])
+
+  // 💸 pagos relacionados
+  pagos     Pago[]
+}
+
+model Pago {
+  id        Int      @id @default(autoincrement())
+  ordenId   Int
+  monto     Float
+  metodo    String   // EFECTIVO | YAPE
+  createdAt DateTime @default(now())
+
+  orden orden @relation(fields: [ordenId], references: [id])
+}
+
+model ingresoExtra {
+  id        Int      @id @default(autoincrement())
+  detalle   String
+  monto     Float
+  createdAt DateTime @default(now())
+}
+model ProductoStock {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  precio      Float
+  stock       Int      @default(0)
+
+  // 📸 varias imágenes
+  imagenes    String[]
+
+  createdAt   DateTime @default(now())
+}
