@@ -28,37 +28,29 @@ model orden {
 
   estado    String
 
-  // 🔧 reparación
   reparacion String?
   precio     Float?
   tipoPago   String?
   motivoNoReparado String?
   enGarantia Boolean @default(false)
 
-  // 🆕 FECHAS DE GARANTÍA
-  fechaIngreso  DateTime @default(now()) // cuando entra el equipo
-  fechaGarantia DateTime?               // cuando se reparó (inicio garantía)
+  fechaIngreso  DateTime @default(now())
+  fechaGarantia DateTime?
 
-  // 💳 crédito
   deuda      Float? @default(0)
 
-  // ✅ FECHA DE PAGO
   fechaPago  DateTime?
 
-  // 🧾 recibo
   recibo     Int? @default(0)
 
-  // 📸 FOTOS DEL EQUIPO
   fotos      String[] @default([])
 
-  // ⏱ FECHAS
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   clienteId Int
   cliente   cliente @relation(fields: [clienteId], references: [id])
 
-  // 💸 pagos relacionados
   pagos     Pago[]
 }
 
@@ -66,7 +58,7 @@ model Pago {
   id        Int      @id @default(autoincrement())
   ordenId   Int
   monto     Float
-  metodo    String   // EFECTIVO | YAPE
+  metodo    String
   createdAt DateTime @default(now())
 
   orden orden @relation(fields: [ordenId], references: [id])
@@ -78,6 +70,7 @@ model ingresoExtra {
   monto     Float
   createdAt DateTime @default(now())
 }
+
 model ProductoStock {
   id          Int      @id @default(autoincrement())
   nombre      String
@@ -85,8 +78,7 @@ model ProductoStock {
   precio      Float
   stock       Int      @default(0)
 
-  // 📸 varias imágenes
-  imagenes    String[]
+  imagenes    String[] @default([])
 
   createdAt   DateTime @default(now())
 }
