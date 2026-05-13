@@ -1,9 +1,7 @@
-const withPWA = require("next-pwa")({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-});
+import type { NextConfig } from "next";
 
-module.exports = withPWA({
-  reactStrictMode: true,
-  turbopack: {},
-});
+const nextConfig: NextConfig = {
+  output: "standalone",
+};
+
+export default nextConfig;
