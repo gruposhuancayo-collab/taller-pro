@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
@@ -39,6 +41,7 @@ export async function POST(req: Request) {
     return Response.json({ ok: true, cliente: nuevo });
   } catch (error) {
     console.error("ERROR API CLIENTES:", error);
+
     return Response.json(
       { error: "Error al guardar cliente" },
       { status: 500 }
