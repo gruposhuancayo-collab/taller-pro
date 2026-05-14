@@ -1,34 +1,52 @@
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const q = searchParams.get("q") || "";
+  try {
+    const { searchParams } = new URL(req.url);
+    const q = searchParams.get("q") || "";
 
-  const clientes = await prisma.cliente.findMany({
-    where: {
-      OR: [
-        { nombre: { contains: q, mode: "insensitive" } },
-        { dni: { contains: q, mode: "insensitive" } },
-      ],
-    },
-    orderBy: { id: "desc" },
-  });
+    const clientes = await prisma.cliente.findMany({
+      where: {
+        OR: [
+          {
+            nombre: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
+          {
+            dni: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      orderBy: {
+        id: "desc",
+      },
+    });
 
-  return Response.json(clientes);
+    return Response.json(clientes);
+
+  } catch (error) {
+
+    console.error(error);
+
+    return Response.json(
+      { error: "error clientes" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
 
-    if (!data.nombre || !data.dni) {
-      return Response.json(
-        { error: "Nombre y DNI son obligatorios" },
-        { status: 400 }
-      );
-    }
+    const data = await req.json();
 
     const nuevo = await prisma.cliente.create({
       data: {
@@ -38,12 +56,17 @@ export async function POST(req: Request) {
       },
     });
 
-    return Response.json({ ok: true, cliente: nuevo });
+    return Response.json({
+      ok: true,
+      cliente: nuevo,
+    });
+
   } catch (error) {
-    console.error("ERROR API CLIENTES:", error);
+
+    console.error(error);
 
     return Response.json(
-      { error: "Error al guardar cliente" },
+      { error: "error crear cliente" },
       { status: 500 }
     );
   }
