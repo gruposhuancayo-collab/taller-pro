@@ -11,7 +11,7 @@ export default function NuevaOrdenPage() {
   const [clienteId, setClienteId] = useState("");
   const [clienteNombre, setClienteNombre] = useState("");
 
-  // 🔥 NUEVO (FOTOS PRO)
+  // 📸 FOTOS
   const [imagenes, setImagenes] = useState<File[]>([]);
   const [preview, setPreview] = useState<string[]>([]);
 
@@ -19,14 +19,16 @@ export default function NuevaOrdenPage() {
 
   const inputStyle = {
     width: "100%",
-    padding: 10,
+    padding: 16,
     marginTop: 10,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    fontSize: 16,
+    borderRadius: 10,
+    border: "2px solid black",
+    fontSize: 18,
+    background: "white",
+    color: "black",
+    opacity: 1,
   };
 
-  // 🔥 CARGAR CLIENTES
   useEffect(() => {
     cargarClientes();
   }, []);
@@ -38,12 +40,12 @@ export default function NuevaOrdenPage() {
 
       setClientes(data);
       setClientesFiltrados(data);
+
     } catch (error) {
-      console.error("Error cargando clientes", error);
+      console.error(error);
     }
   }
 
-  // 🔍 BUSCAR
   function buscar(valor: string) {
     setBusqueda(valor);
 
@@ -53,47 +55,54 @@ export default function NuevaOrdenPage() {
     }
 
     const filtrados = clientes.filter((c) =>
-      `${c.nombre} ${c.dni}`.toLowerCase().includes(valor.toLowerCase())
+      `${c.nombre} ${c.dni}`
+        .toLowerCase()
+        .includes(valor.toLowerCase())
     );
 
     setClientesFiltrados(filtrados);
   }
 
-  // 📸 MANEJAR FOTOS
+  // 📸 AGREGAR MÁS FOTOS
   function manejarFotos(e: any) {
-    const files = Array.from(e.target.files);
-    setImagenes(files as File[]);
+    const files = Array.from(e.target.files) as File[];
 
-    const previews = files.map((file: any) =>
+    const nuevasImagenes = [...imagenes, ...files];
+
+    setImagenes(nuevasImagenes);
+
+    const nuevasPreview = files.map((file) =>
       URL.createObjectURL(file)
     );
 
-    setPreview(previews);
+    setPreview((prev) => [...prev, ...nuevasPreview]);
   }
 
   function eliminarFoto(index: number) {
     const nuevas = [...imagenes];
     nuevas.splice(index, 1);
+
     setImagenes(nuevas);
 
     const nuevasPreview = [...preview];
     nuevasPreview.splice(index, 1);
+
     setPreview(nuevasPreview);
   }
 
-  function validar(form: any) {
+  function validar(form: FormData) {
     if (!clienteId) {
-      setError("⚠️ Debes seleccionar un cliente");
+      setError("Selecciona un cliente");
       return false;
     }
 
     if (!form.get("marca")) {
-      setError("⚠️ La marca es obligatoria");
+      setError("La marca es obligatoria");
       return false;
     }
 
     if (!form.get("problema")) {
-      setError("⚠️ Describe el problema del equipo");
+      setError("Describe el problema");
       return false;
     }
 
@@ -102,18 +111,32 @@ export default function NuevaOrdenPage() {
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: 20 }}>
-      <h1 style={{ fontSize: 24 }}>🧾 Nueva Orden</h1>
+    <div
+      style={{
+        maxWidth: 600,
+        margin: "0 auto",
+        padding: 20,
+      }}
+    >
+      <h1
+        style={{
+          fontSize: 30,
+          color: "white",
+          marginBottom: 20,
+        }}
+      >
+        🧾 Nueva Orden
+      </h1>
 
-      {/* ERROR */}
       {error && (
         <div
           style={{
             background: "#fee2e2",
             color: "#991b1b",
-            padding: 10,
-            borderRadius: 6,
-            marginTop: 10,
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 15,
+            fontWeight: "bold",
           }}
         >
           {error}
@@ -129,7 +152,7 @@ export default function NuevaOrdenPage() {
 
             if (!validar(form)) return;
 
-            // 🔥 AGREGAR FOTOS
+            // 📸 AGREGAR FOTOS
             imagenes.forEach((img) => {
               form.append("fotos", img);
             });
@@ -141,79 +164,46 @@ export default function NuevaOrdenPage() {
 
             const data = await res.json();
 
-            if (!res.ok || !data.ok) {
-              setError(data.error || "Error al guardar orden");
+            if (!data.ok) {
+              setError(data.error || "Error guardando");
               return;
             }
 
             // ✅ WHATSAPP
-            const msg = `Hola, tu equipo fue registrado en el taller ✅
-Código: ${data.codigo}`;
+            const msg =
+              `Hola, tu equipo fue registrado ✅\n` +
+              `Código: ${data.codigo}`;
 
             window.open(
               `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`
             );
 
-            // 🧾 TICKET
-            const ticket = `
---------------------------------
-        SHINHWA REPAIR
---------------------------------
-Código: ${data.codigo}
+            window.location.href = "/ordenes";
 
-Cliente: ${clienteNombre}
-
-Equipo: ${form.get("marca")}
-Modelo: ${form.get("modelo") || "-"}
-
-Serie: ${form.get("serie") || "-"}
-
-Problema:
-${form.get("problema")}
-
-Fecha: ${new Date().toLocaleString()}
-
---------------------------------
-   EQUIPO EN RECEPCIÓN
---------------------------------
-`;
-
-            const win = window.open("", "", "width=300,height=600");
-
-            win?.document.write(`
-<pre style="font-size:12px">
-${ticket}
-</pre>
-<script>
-window.print();
-window.close();
-</script>
-`);
-
-            window.location.href = "/ordenes?ok=1";
           } catch (err) {
             console.error(err);
             setError("Error de conexión");
           }
         }}
       >
-        {/* 🔍 BUSCAR */}
+        {/* 🔍 BUSCADOR */}
         <input
           value={busqueda}
           onChange={(e) => buscar(e.target.value)}
-          placeholder="Buscar cliente por DNI o nombre"
+          placeholder="Buscar cliente por nombre o DNI"
           style={inputStyle}
         />
 
-        {/* LISTA */}
+        {/* LISTA CLIENTES */}
         {clientesFiltrados.length > 0 && (
           <div
             style={{
-              border: "1px solid #ccc",
-              borderRadius: 6,
-              marginTop: 5,
-              maxHeight: 200,
+              border: "2px solid black",
+              borderRadius: 10,
+              marginTop: 10,
+              maxHeight: 250,
               overflowY: "auto",
+              background: "white",
             }}
           >
             {clientesFiltrados.map((c) => (
@@ -226,13 +216,17 @@ window.close();
                   setClientesFiltrados([]);
                 }}
                 style={{
-                  padding: 12,
+                  padding: 15,
                   cursor: "pointer",
-                  borderBottom: "1px solid #eee",
-                  fontSize: 16,
+                  borderBottom: "1px solid #ddd",
+                  color: "black",
+                  fontSize: 18,
+                  background: "white",
                 }}
               >
-                {c.nombre} - {c.dni}
+                <strong>{c.nombre}</strong>
+                <br />
+                DNI: {c.dni}
               </div>
             ))}
           </div>
@@ -242,54 +236,108 @@ window.close();
         {clienteNombre && (
           <div
             style={{
-              marginTop: 10,
-              padding: 10,
-              background: "#ecfdf5",
-              border: "1px solid #10b981",
-              borderRadius: 6,
+              marginTop: 15,
+              padding: 15,
+              background: "#dcfce7",
+              borderRadius: 10,
+              color: "black",
+              fontWeight: "bold",
             }}
           >
-            ✅ Cliente: <b>{clienteNombre}</b>
+            ✅ Cliente seleccionado: {clienteNombre}
           </div>
         )}
 
-        <input type="hidden" name="clienteId" value={clienteId} />
-
-        <br />
+        <input
+          type="hidden"
+          name="clienteId"
+          value={clienteId}
+        />
 
         {/* CAMPOS */}
-        <input name="producto" defaultValue="Laptop" style={inputStyle} />
-        <input name="marca" placeholder="Marca" style={inputStyle} />
-        <input name="modelo" placeholder="Modelo" style={inputStyle} />
-        <input name="serie" placeholder="Serie" style={inputStyle} />
+        <input
+          name="producto"
+          defaultValue="Laptop"
+          style={inputStyle}
+        />
+
+        <input
+          name="marca"
+          placeholder="Marca"
+          style={inputStyle}
+        />
+
+        <input
+          name="modelo"
+          placeholder="Modelo"
+          style={inputStyle}
+        />
+
+        <input
+          name="serie"
+          placeholder="Serie"
+          style={inputStyle}
+        />
 
         <textarea
           name="problema"
           placeholder="Problema del equipo"
-          style={{ ...inputStyle, height: 100 }}
+          style={{
+            ...inputStyle,
+            height: 120,
+          }}
         />
 
-        {/* 📸 INPUT CÁMARA PRO */}
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          capture="environment"
-          onChange={manejarFotos}
-          style={inputStyle}
-        />
+        {/* 📸 BOTÓN FOTO */}
+        <label
+          style={{
+            marginTop: 15,
+            display: "block",
+            background: "#2563eb",
+            color: "white",
+            padding: 16,
+            borderRadius: 10,
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 18,
+            cursor: "pointer",
+          }}
+        >
+          📸 Agregar otra foto
 
-        {/* 🖼 PREVIEW */}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={manejarFotos}
+            style={{ display: "none" }}
+          />
+        </label>
+
+        {/* PREVIEW */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 10,
+            marginTop: 15,
+          }}
+        >
           {preview.map((img, i) => (
-            <div key={i} style={{ position: "relative" }}>
+            <div
+              key={i}
+              style={{
+                position: "relative",
+              }}
+            >
               <img
                 src={img}
                 style={{
-                  width: 80,
-                  height: 80,
+                  width: 90,
+                  height: 90,
                   objectFit: "cover",
-                  borderRadius: 6,
+                  borderRadius: 10,
+                  border: "2px solid white",
                 }}
               />
 
@@ -298,15 +346,16 @@ window.close();
                 onClick={() => eliminarFoto(i)}
                 style={{
                   position: "absolute",
-                  top: -5,
-                  right: -5,
+                  top: -8,
+                  right: -8,
+                  width: 24,
+                  height: 24,
+                  borderRadius: "50%",
+                  border: "none",
                   background: "red",
                   color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  width: 20,
-                  height: 20,
                   cursor: "pointer",
+                  fontWeight: "bold",
                 }}
               >
                 X
@@ -315,22 +364,23 @@ window.close();
           ))}
         </div>
 
-        {/* BOTÓN */}
+        {/* GUARDAR */}
         <button
+          type="submit"
           style={{
-            marginTop: 15,
-            padding: 15,
-            fontSize: 16,
-            borderRadius: 8,
+            marginTop: 20,
             width: "100%",
-            background: "#2563eb",
-            color: "white",
+            padding: 18,
+            borderRadius: 10,
             border: "none",
+            background: "#16a34a",
+            color: "white",
+            fontSize: 20,
             fontWeight: "bold",
             cursor: "pointer",
           }}
         >
-          💾 Guardar orden
+          💾 Guardar Orden
         </button>
       </form>
     </div>
