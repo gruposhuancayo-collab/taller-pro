@@ -14,26 +14,44 @@ export async function POST(req: Request) {
     const serie = String(data.get("serie") || "");
     const problema = String(data.get("problema") || "");
 
+    // 📸 MULTIPLES FOTOS
+    const fotos = data.getAll("fotos") as File[];
+
     // 🔥 VALIDACIÓN
     if (!clienteId || !marca || !problema) {
       return NextResponse.json(
-        { ok: false, error: "Datos incompletos" },
-        { status: 400 }
+        {
+          ok: false,
+          error: "Datos incompletos",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
     const cliente = await prisma.cliente.findUnique({
-      where: { id: clienteId },
+      where: {
+        id: clienteId,
+      },
     });
 
     if (!cliente) {
       return NextResponse.json(
-        { ok: false, error: "Cliente no existe" },
-        { status: 404 }
+        {
+          ok: false,
+          error: "Cliente no existe",
+        },
+        {
+          status: 404,
+        }
       );
     }
 
     const codigo = `ORD-${Date.now()}`;
+
+    // 🔥 GUARDAR NOMBRES DE FOTOS
+    const nombresFotos = fotos.map((f) => f.name);
 
     const orden = await prisma.orden.create({
       data: {
@@ -45,10 +63,12 @@ export async function POST(req: Request) {
         problema,
         codigo,
         estado: "RECIBIDO",
+
+        // 📸 GUARDAR ARRAY
+        fotos: nombresFotos,
       },
     });
 
-    // ✅ SOLO SI TODO SALE BIEN
     return NextResponse.json({
       ok: true,
       codigo: orden.codigo,
@@ -56,11 +76,17 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
+
     console.error("🔥 ERROR REAL:", error);
 
     return NextResponse.json(
-      { ok: false, error: "Error al guardar orden" },
-      { status: 500 }
+      {
+        ok: false,
+        error: "Error al guardar orden",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

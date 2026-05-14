@@ -132,12 +132,28 @@ export default function ClientesPage() {
 
       {/* LISTADO */}
       <div>
-        <h2 style={{ marginBottom: 10 }}>Lista de clientes</h2>
+        <h2
+        style={{
+        marginBottom: 10,
+        color: "white",
+        fontSize: 28,
+        fontWeight: "bold",
+       }}
+>
+  Lista de clientes
+</h2>
 
         {loading && <p>Cargando...</p>}
 
         {!loading && clientes.length === 0 && (
-          <p>No hay clientes registrados</p>
+          <p
+            style={{
+            color: "white",
+            fontSize: 22,
+           }}
+>
+  No hay clientes registrados
+</p>
         )}
 
         <div style={{ display: "grid", gap: 10 }}>
@@ -151,9 +167,32 @@ export default function ClientesPage() {
                 background: "#fff",
               }}
             >
-              <strong style={{ fontSize: 16 }}>{c.nombre}</strong>
-              <p style={{ margin: 0 }}>DNI: {c.dni}</p>
-              <p style={{ margin: 0 }}>Celular: {c.celular}</p>
+              <strong
+  style={{
+    fontSize: 20,
+    color: "black",
+  }}
+>
+  {c.nombre}
+</strong>
+
+<p
+  style={{
+    margin: 0,
+    color: "black",
+  }}
+>
+  DNI: {c.dni}
+</p>
+
+<p
+  style={{
+    margin: 0,
+    color: "black",
+  }}
+>
+  Celular: {c.celular}
+</p>
             </div>
           ))}
         </div>
