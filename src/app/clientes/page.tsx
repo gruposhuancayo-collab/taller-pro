@@ -11,10 +11,14 @@ export default function ClientesPage() {
 
   // 🎨 estilo reutilizable
   const inputStyle = {
-    padding: 10,
-    border: "1px solid #ccc",
-    borderRadius: 6,
     width: "100%",
+    padding: 18,
+    fontSize: 22,
+    borderRadius: 10,
+    border: "2px solid black",
+    background: "white",
+    color: "black",
+    opacity: 1,
   };
 
   // 🔍 Cargar clientes
