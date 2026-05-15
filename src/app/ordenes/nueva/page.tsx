@@ -134,10 +134,8 @@ export default function NuevaOrdenPage() {
         return;
       }
 
-      // 🔥 agregar fotos una por una
-      imagenes.forEach((img, index) => {
-        form.append(`foto_${index}`, img);
-      });
+     
+     
 
       const res = await fetch("/api/orden", {
         method: "POST",

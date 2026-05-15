@@ -14,12 +14,9 @@ export async function POST(req: Request) {
     const serie = String(data.get("serie") || "");
     const problema = String(data.get("problema") || "");
 
-    // 📸 LEER FOTOS
-    const fotos = data.getAll("fotos");
+    // 🔥 IGNORAR FOTOS COMPLETAMENTE
+    // para que Android no rompa el guardado
 
-    console.log("FOTOS:", fotos.length);
-
-    // VALIDACIÓN
     if (!clienteId || !marca || !problema) {
       return NextResponse.json(
         {
@@ -52,7 +49,6 @@ export async function POST(req: Request) {
 
     const codigo = `ORD-${Date.now()}`;
 
-    // ✅ GUARDAR ORDEN
     const orden = await prisma.orden.create({
       data: {
         clienteId,
@@ -66,9 +62,6 @@ export async function POST(req: Request) {
       },
     });
 
-    // 🔥 IGNORAR FOTOS POR AHORA
-    // luego las subimos a cloudinary
-
     return NextResponse.json({
       ok: true,
       codigo: orden.codigo,
@@ -76,7 +69,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error("ERROR API ORDEN:", error);
+    console.error(error);
 
     return NextResponse.json(
       {
