@@ -11,7 +11,6 @@ export default function NuevaOrdenPage() {
   const [clienteId, setClienteId] = useState("");
   const [clienteNombre, setClienteNombre] = useState("");
 
-  // 📸 FOTOS
   const [imagenes, setImagenes] = useState<File[]>([]);
   const [preview, setPreview] = useState<string[]>([]);
 
@@ -27,7 +26,6 @@ export default function NuevaOrdenPage() {
     fontSize: 18,
     background: "white",
     color: "black",
-    opacity: 1,
     boxSizing: "border-box" as const,
   };
 
@@ -38,11 +36,9 @@ export default function NuevaOrdenPage() {
   async function cargarClientes() {
     try {
       const res = await fetch("/api/clientes");
-
       const data = await res.json();
 
       setClientes(data);
-      setClientesFiltrados(data);
 
     } catch (error) {
       console.error(error);
@@ -67,49 +63,38 @@ export default function NuevaOrdenPage() {
   }
 
   // 📸 AGREGAR FOTO
-async function manejarFotos(e: any) {
-  const file = e.target.files?.[0];
+  async function manejarFotos(e: any) {
+    const file = e.target.files?.[0];
 
-  if (!file) return;
+    if (!file) return;
 
-  try {
-    // 🔥 COMPRIMIR
-    const compressedFile = await imageCompression(file, {
-      maxSizeMB: 0.7,
-      maxWidthOrHeight: 1280,
-      useWebWorker: true,
-    });
+    try {
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 0.7,
+        maxWidthOrHeight: 1280,
+        useWebWorker: true,
+      });
 
-    setImagenes((prev) => [
-      ...prev,
-      compressedFile as File,
-    ]);
+      setImagenes((prev) => [
+        ...prev,
+        compressedFile as File,
+      ]);
 
-    const nuevaPreview = URL.createObjectURL(
-      compressedFile
-    );
+      const nuevaPreview = URL.createObjectURL(
+        compressedFile
+      );
 
-    setPreview((prev) => [
-      ...prev,
-      nuevaPreview,
-    ]);
+      setPreview((prev) => [
+        ...prev,
+        nuevaPreview,
+      ]);
 
-    e.target.value = "";
+      e.target.value = "";
 
-  } catch (error) {
-    console.error(error);
-    alert("Error procesando imagen");
-  }
-}
-
-    setImagenes((prev) => [...prev, file]);
-
-    const nuevaPreview = URL.createObjectURL(file);
-
-    setPreview((prev) => [...prev, nuevaPreview]);
-
-    // 🔥 limpiar input
-    e.target.value = "";
+    } catch (error) {
+      console.error(error);
+      alert("Error procesando imagen");
+    }
   }
 
   function eliminarFoto(index: number) {
@@ -159,8 +144,10 @@ async function manejarFotos(e: any) {
         return;
       }
 
-     
-     
+      // 📸 AGREGAR FOTOS
+      imagenes.forEach((img) => {
+        form.append("fotos", img);
+      });
 
       const res = await fetch("/api/orden", {
         method: "POST",
@@ -175,7 +162,6 @@ async function manejarFotos(e: any) {
         return;
       }
 
-      // ✅ WhatsApp
       const msg =
         `Hola, tu equipo fue registrado correctamente ✅\n\n` +
         `Código: ${data.codigo}`;
@@ -184,11 +170,9 @@ async function manejarFotos(e: any) {
         `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`
       );
 
-      // ✅ limpiar
       setImagenes([]);
       setPreview([]);
 
-      // ✅ redireccionar
       window.location.href = "/ordenes";
 
     } catch (err) {
@@ -236,7 +220,6 @@ async function manejarFotos(e: any) {
 
       <form onSubmit={guardarOrden}>
 
-        {/* 🔍 BUSCADOR */}
         <input
           value={busqueda}
           onChange={(e) => buscar(e.target.value)}
@@ -244,7 +227,6 @@ async function manejarFotos(e: any) {
           style={inputStyle}
         />
 
-        {/* CLIENTES */}
         {clientesFiltrados.length > 0 && (
           <div
             style={{
@@ -271,20 +253,16 @@ async function manejarFotos(e: any) {
                   borderBottom: "1px solid #ddd",
                   color: "black",
                   fontSize: 18,
-                  background: "white",
                 }}
               >
                 <strong>{c.nombre}</strong>
-
                 <br />
-
                 DNI: {c.dni}
               </div>
             ))}
           </div>
         )}
 
-        {/* CLIENTE */}
         {clienteNombre && (
           <div
             style={{
@@ -307,7 +285,6 @@ async function manejarFotos(e: any) {
           value={clienteId}
         />
 
-        {/* CAMPOS */}
         <input
           name="producto"
           defaultValue="Laptop"
@@ -341,7 +318,6 @@ async function manejarFotos(e: any) {
           }}
         />
 
-        {/* 📸 BOTÓN FOTO */}
         <label
           style={{
             marginTop: 15,
@@ -367,7 +343,6 @@ async function manejarFotos(e: any) {
           />
         </label>
 
-        {/* 🖼 PREVIEW */}
         <div
           style={{
             display: "flex",
@@ -417,7 +392,6 @@ async function manejarFotos(e: any) {
           ))}
         </div>
 
-        {/* BOTÓN */}
         <button
           type="submit"
           disabled={guardando}
