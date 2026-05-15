@@ -64,19 +64,20 @@ export default function NuevaOrdenPage() {
   }
 
   // 📸 AGREGAR MÁS FOTOS
-  function manejarFotos(e: any) {
-    const files = Array.from(e.target.files) as File[];
+   function manejarFotos(e: any) {
+    const file = e.target.files?.[0];
 
-    const nuevasImagenes = [...imagenes, ...files];
+    if (!file) return;
 
-    setImagenes(nuevasImagenes);
+    setImagenes((prev) => [...prev, file]);
 
-    const nuevasPreview = files.map((file) =>
-      URL.createObjectURL(file)
-    );
+    const nuevaPreview = URL.createObjectURL(file);
 
-    setPreview((prev) => [...prev, ...nuevasPreview]);
-  }
+    setPreview((prev) => [...prev, nuevaPreview]);
+
+  // 🔥 limpiar input
+  e.target.value = "";
+}
 
   function eliminarFoto(index: number) {
     const nuevas = [...imagenes];
@@ -306,12 +307,12 @@ export default function NuevaOrdenPage() {
           📸 Agregar otra foto
 
           <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={manejarFotos}
-            style={{ display: "none" }}
-          />
+           type="file"
+           accept="image/*"
+           capture="environment"
+           onChange={manejarFotos}
+           style={{ display: "none" }}
+        />
         </label>
 
         {/* PREVIEW */}
