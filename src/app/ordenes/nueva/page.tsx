@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 
 export default function NuevaOrdenPage() {
   const [busqueda, setBusqueda] = useState("");
-
   const [clientes, setClientes] = useState<any[]>([]);
   const [clientesFiltrados, setClientesFiltrados] = useState<any[]>([]);
 
@@ -15,6 +14,7 @@ export default function NuevaOrdenPage() {
   const [imagenes, setImagenes] = useState<File[]>([]);
   const [preview, setPreview] = useState<string[]>([]);
 
+  const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
 
   const inputStyle = {
@@ -27,6 +27,7 @@ export default function NuevaOrdenPage() {
     background: "white",
     color: "black",
     opacity: 1,
+    boxSizing: "border-box" as const,
   };
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function NuevaOrdenPage() {
   async function cargarClientes() {
     try {
       const res = await fetch("/api/clientes");
+
       const data = await res.json();
 
       setClientes(data);
@@ -49,8 +51,8 @@ export default function NuevaOrdenPage() {
   function buscar(valor: string) {
     setBusqueda(valor);
 
-    if (!valor) {
-      setClientesFiltrados(clientes);
+    if (!valor.trim()) {
+      setClientesFiltrados([]);
       return;
     }
 
@@ -63,11 +65,17 @@ export default function NuevaOrdenPage() {
     setClientesFiltrados(filtrados);
   }
 
-  // 📸 AGREGAR MÁS FOTOS
-   function manejarFotos(e: any) {
+  // 📸 AGREGAR FOTO
+  function manejarFotos(e: any) {
     const file = e.target.files?.[0];
 
     if (!file) return;
+
+    // 🔥 evitar archivos enormes
+    if (file.size > 5 * 1024 * 1024) {
+      alert("La foto es muy pesada");
+      return;
+    }
 
     setImagenes((prev) => [...prev, file]);
 
@@ -75,9 +83,9 @@ export default function NuevaOrdenPage() {
 
     setPreview((prev) => [...prev, nuevaPreview]);
 
-  // 🔥 limpiar input
-  e.target.value = "";
-}
+    // 🔥 limpiar input
+    e.target.value = "";
+  }
 
   function eliminarFoto(index: number) {
     const nuevas = [...imagenes];
@@ -111,6 +119,64 @@ export default function NuevaOrdenPage() {
     return true;
   }
 
+  async function guardarOrden(e: any) {
+    e.preventDefault();
+
+    if (guardando) return;
+
+    try {
+      setGuardando(true);
+
+      const form = new FormData(e.currentTarget);
+
+      if (!validar(form)) {
+        setGuardando(false);
+        return;
+      }
+
+      // 🔥 agregar fotos una por una
+      imagenes.forEach((img, index) => {
+        form.append(`foto_${index}`, img);
+      });
+
+      const res = await fetch("/api/orden", {
+        method: "POST",
+        body: form,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        setError(data.error || "Error guardando orden");
+        setGuardando(false);
+        return;
+      }
+
+      // ✅ WhatsApp
+      const msg =
+        `Hola, tu equipo fue registrado correctamente ✅\n\n` +
+        `Código: ${data.codigo}`;
+
+      window.open(
+        `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`
+      );
+
+      // ✅ limpiar
+      setImagenes([]);
+      setPreview([]);
+
+      // ✅ redireccionar
+      window.location.href = "/ordenes";
+
+    } catch (err) {
+      console.error(err);
+
+      setError("Error de conexión");
+
+      setGuardando(false);
+    }
+  }
+
   return (
     <div
       style={{
@@ -138,55 +204,15 @@ export default function NuevaOrdenPage() {
             borderRadius: 8,
             marginBottom: 15,
             fontWeight: "bold",
+            fontSize: 18,
           }}
         >
           {error}
         </div>
       )}
 
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
+      <form onSubmit={guardarOrden}>
 
-          try {
-            const form = new FormData(e.currentTarget);
-
-            if (!validar(form)) return;
-
-            // 📸 AGREGAR FOTOS
-            imagenes.forEach((img) => {
-              form.append("fotos", img);
-            });
-
-            const res = await fetch("/api/orden", {
-              method: "POST",
-              body: form,
-            });
-
-            const data = await res.json();
-
-            if (!data.ok) {
-              setError(data.error || "Error guardando");
-              return;
-            }
-
-            // ✅ WHATSAPP
-            const msg =
-              `Hola, tu equipo fue registrado ✅\n` +
-              `Código: ${data.codigo}`;
-
-            window.open(
-              `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`
-            );
-
-            window.location.href = "/ordenes";
-
-          } catch (err) {
-            console.error(err);
-            setError("Error de conexión");
-          }
-        }}
-      >
         {/* 🔍 BUSCADOR */}
         <input
           value={busqueda}
@@ -195,7 +221,7 @@ export default function NuevaOrdenPage() {
           style={inputStyle}
         />
 
-        {/* LISTA CLIENTES */}
+        {/* CLIENTES */}
         {clientesFiltrados.length > 0 && (
           <div
             style={{
@@ -211,7 +237,7 @@ export default function NuevaOrdenPage() {
               <div
                 key={c.id}
                 onClick={() => {
-                  setClienteId(c.id);
+                  setClienteId(c.id.toString());
                   setClienteNombre(c.nombre);
                   setBusqueda(c.nombre);
                   setClientesFiltrados([]);
@@ -226,7 +252,9 @@ export default function NuevaOrdenPage() {
                 }}
               >
                 <strong>{c.nombre}</strong>
+
                 <br />
+
                 DNI: {c.dni}
               </div>
             ))}
@@ -243,6 +271,7 @@ export default function NuevaOrdenPage() {
               borderRadius: 10,
               color: "black",
               fontWeight: "bold",
+              fontSize: 18,
             }}
           >
             ✅ Cliente seleccionado: {clienteNombre}
@@ -307,15 +336,15 @@ export default function NuevaOrdenPage() {
           📸 Agregar otra foto
 
           <input
-           type="file"
-           accept="image/*"
-           capture="environment"
-           onChange={manejarFotos}
-           style={{ display: "none" }}
-        />
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={manejarFotos}
+            style={{ display: "none" }}
+          />
         </label>
 
-        {/* PREVIEW */}
+        {/* 🖼 PREVIEW */}
         <div
           style={{
             display: "flex",
@@ -365,24 +394,28 @@ export default function NuevaOrdenPage() {
           ))}
         </div>
 
-        {/* GUARDAR */}
+        {/* BOTÓN */}
         <button
           type="submit"
+          disabled={guardando}
           style={{
             marginTop: 20,
             width: "100%",
             padding: 18,
             borderRadius: 10,
             border: "none",
-            background: "#16a34a",
+            background: guardando ? "#9ca3af" : "#16a34a",
             color: "white",
             fontSize: 20,
             fontWeight: "bold",
             cursor: "pointer",
           }}
         >
-          💾 Guardar Orden
+          {guardando
+            ? "Guardando..."
+            : "💾 Guardar Orden"}
         </button>
+
       </form>
     </div>
   );
