@@ -1,7 +1,32 @@
 export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
+import cloudinary from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
+
+async function subirImagen(file: File) {
+  const bytes = await file.arrayBuffer();
+
+  const buffer = Buffer.from(bytes);
+
+  return new Promise<string>((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "taller-pro",
+        },
+        (error, result) => {
+          if (error || !result) {
+            reject(error);
+            return;
+          }
+
+          resolve(result.secure_url);
+        }
+      )
+      .end(buffer);
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,9 +38,6 @@ export async function POST(req: Request) {
     const modelo = String(data.get("modelo") || "");
     const serie = String(data.get("serie") || "");
     const problema = String(data.get("problema") || "");
-
-    // 🔥 IGNORAR FOTOS COMPLETAMENTE
-    // para que Android no rompa el guardado
 
     if (!clienteId || !marca || !problema) {
       return NextResponse.json(
@@ -47,6 +69,18 @@ export async function POST(req: Request) {
       );
     }
 
+    // 📸 SUBIR FOTOS
+    const fotos: string[] = [];
+
+    for (const value of data.values()) {
+      if (value instanceof File) {
+        if (value.size > 0) {
+          const url = await subirImagen(value);
+          fotos.push(url);
+        }
+      }
+    }
+
     const codigo = `ORD-${Date.now()}`;
 
     const orden = await prisma.orden.create({
@@ -59,6 +93,7 @@ export async function POST(req: Request) {
         problema,
         codigo,
         estado: "RECIBIDO",
+        fotos,
       },
     });
 
@@ -69,7 +104,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("ERROR ORDEN:", error);
 
     return NextResponse.json(
       {
