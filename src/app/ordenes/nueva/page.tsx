@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import imageCompression from "browser-image-compression";
 
 export default function NuevaOrdenPage() {
   const [busqueda, setBusqueda] = useState("");
@@ -66,16 +67,40 @@ export default function NuevaOrdenPage() {
   }
 
   // 📸 AGREGAR FOTO
-  function manejarFotos(e: any) {
-    const file = e.target.files?.[0];
+async function manejarFotos(e: any) {
+  const file = e.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    // 🔥 evitar archivos enormes
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La foto es muy pesada");
-      return;
-    }
+  try {
+    // 🔥 COMPRIMIR
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 0.7,
+      maxWidthOrHeight: 1280,
+      useWebWorker: true,
+    });
+
+    setImagenes((prev) => [
+      ...prev,
+      compressedFile as File,
+    ]);
+
+    const nuevaPreview = URL.createObjectURL(
+      compressedFile
+    );
+
+    setPreview((prev) => [
+      ...prev,
+      nuevaPreview,
+    ]);
+
+    e.target.value = "";
+
+  } catch (error) {
+    console.error(error);
+    alert("Error procesando imagen");
+  }
+}
 
     setImagenes((prev) => [...prev, file]);
 
