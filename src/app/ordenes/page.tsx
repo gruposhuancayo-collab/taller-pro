@@ -65,8 +65,8 @@ export default async function OrdenesPage({
   return (
     <div
       style={{
-        padding: 20,
-        maxWidth: 900,
+        padding: 12,
+        maxWidth: 700,
         margin: "0 auto",
       }}
     >
@@ -77,12 +77,12 @@ export default async function OrdenesPage({
           justifyContent: "space-between",
           alignItems: "center",
           gap: 10,
-          flexWrap: "wrap",
+          marginBottom: 15,
         }}
       >
         <h1
           style={{
-            fontSize: 32,
+            fontSize: 28,
             color: "white",
             margin: 0,
           }}
@@ -95,35 +95,31 @@ export default async function OrdenesPage({
             style={{
               background: "#2563eb",
               color: "white",
-              padding: "14px 18px",
-              borderRadius: 12,
+              padding: "12px 14px",
+              borderRadius: 10,
               border: "none",
               cursor: "pointer",
               fontWeight: "bold",
-              fontSize: 16,
+              fontSize: 14,
             }}
           >
-            ➕ Nueva Orden
+            ➕ Nueva
           </button>
         </Link>
       </div>
 
       {/* BUSCADOR */}
-      <form
-        style={{
-          marginTop: 20,
-        }}
-      >
+      <form>
         <input
           name="q"
-          placeholder="🔍 Buscar cliente, serie, marca..."
+          placeholder="🔍 Buscar cliente o código"
           defaultValue={resolvedSearchParams?.q || ""}
           style={{
             width: "100%",
-            padding: 18,
-            borderRadius: 12,
+            padding: 14,
+            borderRadius: 10,
             border: "2px solid black",
-            fontSize: 18,
+            fontSize: 16,
             background: "white",
             color: "black",
             boxSizing: "border-box",
@@ -137,11 +133,11 @@ export default async function OrdenesPage({
           style={{
             background: "#dcfce7",
             color: "#166534",
-            padding: 15,
+            padding: 12,
             borderRadius: 10,
             marginTop: 15,
             fontWeight: "bold",
-            fontSize: 18,
+            fontSize: 15,
           }}
         >
           ✅ Orden creada correctamente
@@ -152,14 +148,12 @@ export default async function OrdenesPage({
       {ordenes.length === 0 ? (
         <div
           style={{
-            marginTop: 25,
-            padding: 30,
-            borderRadius: 16,
+            marginTop: 20,
+            padding: 20,
+            borderRadius: 12,
             background: "#111827",
-            border: "1px solid #374151",
             textAlign: "center",
             color: "white",
-            fontSize: 20,
           }}
         >
           No hay órdenes registradas
@@ -167,9 +161,9 @@ export default async function OrdenesPage({
       ) : (
         <div
           style={{
-            marginTop: 20,
+            marginTop: 15,
             display: "grid",
-            gap: 15,
+            gap: 10,
           }}
         >
           {ordenes.map((o) => (
@@ -177,65 +171,76 @@ export default async function OrdenesPage({
               key={o.id}
               style={{
                 background: "#111827",
-                padding: 18,
-                borderRadius: 16,
+                padding: 14,
+                borderRadius: 12,
                 border: "1px solid #374151",
               }}
             >
-              {/* TOP */}
+              {/* FILA */}
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  gap: 15,
-                  flexWrap: "wrap",
+                  gap: 10,
+                  alignItems: "center",
                 }}
               >
                 {/* INFO */}
                 <div
                   style={{
                     flex: 1,
-                    minWidth: 240,
+                    minWidth: 0,
                   }}
                 >
                   <div
                     style={{
-                      fontWeight: "bold",
-                      fontSize: 22,
                       color: "white",
-                    }}
-                  >
-                    {o.cliente?.nombre || "Sin cliente"}
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 8,
-                      color: "#d1d5db",
-                      fontSize: 18,
-                    }}
-                  >
-                    {o.producto} - {o.marca} {o.modelo || ""}
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 8,
-                      color: "#9ca3af",
-                      fontSize: 14,
-                    }}
-                  >
-                    Código: {o.codigo}
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: 10,
-                      display: "inline-block",
-                      padding: "6px 12px",
-                      borderRadius: 999,
                       fontWeight: "bold",
+                      fontSize: 17,
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {o.cliente?.nombre}
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#d1d5db",
                       fontSize: 14,
+                      marginTop: 3,
+                    }}
+                  >
+                    {o.marca} {o.modelo || ""}
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#9ca3af",
+                      fontSize: 12,
+                      marginTop: 3,
+                    }}
+                  >
+                    {o.codigo}
+                  </div>
+                </div>
+
+                {/* ESTADO */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    gap: 5,
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "5px 10px",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      fontWeight: "bold",
                       background:
                         o.estado === "LISTO"
                           ? "#166534"
@@ -247,83 +252,34 @@ export default async function OrdenesPage({
                   >
                     {o.estado}
                   </div>
-                </div>
 
-                {/* ICONOS */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "center",
-                    fontSize: 30,
-                  }}
-                >
-                  {(o.deuda || 0) > 0 && (
-                    <div title="Cliente con deuda">
-                      💳
-                    </div>
-                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 5,
+                      fontSize: 18,
+                    }}
+                  >
+                    {(o.deuda || 0) > 0 && <span>💳</span>}
 
-                  {o.fechaGarantia &&
-                  new Date(o.fechaGarantia) >= new Date() ? (
-                    <div title="En garantía">
-                      🛡️
-                    </div>
-                  ) : (
-                    <div title="Sin garantía">
-                      ❌
-                    </div>
-                  )}
-
-                  {o.fotos?.length > 0 && (
-                    <div title="Tiene fotos">
-                      📸
-                    </div>
-                  )}
+                    {o.fotos?.length > 0 && <span>📸</span>}
+                  </div>
                 </div>
               </div>
-
-              {/* MINI FOTOS */}
-              {o.fotos?.length > 0 && (
-                <div
-                  style={{
-                    display: "flex",
-                    gap: 10,
-                    overflowX: "auto",
-                    marginTop: 15,
-                    paddingBottom: 5,
-                  }}
-                >
-                  {o.fotos.map((foto, index) => (
-                    <img
-                      key={index}
-                      src={foto}
-                      style={{
-                        width: 80,
-                        height: 80,
-                        objectFit: "cover",
-                        borderRadius: 10,
-                        border: "2px solid #374151",
-                        flexShrink: 0,
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
 
               {/* BOTÓN */}
               <Link href={`/ordenes/${o.id}`}>
                 <button
                   style={{
-                    marginTop: 18,
+                    marginTop: 12,
                     background: "#2563eb",
                     color: "white",
-                    padding: "14px 16px",
+                    padding: "10px",
                     border: "none",
-                    borderRadius: 12,
+                    borderRadius: 10,
                     cursor: "pointer",
                     width: "100%",
-                    fontSize: 17,
+                    fontSize: 14,
                     fontWeight: "bold",
                   }}
                 >
