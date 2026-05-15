@@ -14,10 +14,12 @@ export async function POST(req: Request) {
     const serie = String(data.get("serie") || "");
     const problema = String(data.get("problema") || "");
 
-    // 📸 MULTIPLES FOTOS
-    const fotos = data.getAll("fotos") as File[];
+    // 📸 LEER FOTOS
+    const fotos = data.getAll("fotos");
 
-    // 🔥 VALIDACIÓN
+    console.log("FOTOS:", fotos.length);
+
+    // VALIDACIÓN
     if (!clienteId || !marca || !problema) {
       return NextResponse.json(
         {
@@ -50,9 +52,7 @@ export async function POST(req: Request) {
 
     const codigo = `ORD-${Date.now()}`;
 
-    // 🔥 GUARDAR NOMBRES DE FOTOS
-    const nombresFotos = fotos.map((f) => f.name);
-
+    // ✅ GUARDAR ORDEN
     const orden = await prisma.orden.create({
       data: {
         clienteId,
@@ -63,21 +63,20 @@ export async function POST(req: Request) {
         problema,
         codigo,
         estado: "RECIBIDO",
-
-        // 📸 GUARDAR ARRAY
-        fotos: nombresFotos,
       },
     });
+
+    // 🔥 IGNORAR FOTOS POR AHORA
+    // luego las subimos a cloudinary
 
     return NextResponse.json({
       ok: true,
       codigo: orden.codigo,
-      telefono: cliente.celular,
+      telefono: cliente.celular || "",
     });
 
   } catch (error) {
-
-    console.error("🔥 ERROR REAL:", error);
+    console.error("ERROR API ORDEN:", error);
 
     return NextResponse.json(
       {
