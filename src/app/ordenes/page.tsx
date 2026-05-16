@@ -200,7 +200,7 @@ Gracias por confiar en SHINHWA REPAIR 🔧
 `;
 
             const telefono =
-              o.cliente?.telefono || "";
+              o.cliente?.celular || "";
 
             const wa =
               `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`;
