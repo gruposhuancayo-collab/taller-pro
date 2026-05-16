@@ -5,20 +5,34 @@ export function middleware(req: NextRequest) {
 
   const path = req.nextUrl.pathname;
 
-  // 🔒 SI ES SEGUIMIENTO
-  if (path.startsWith("/seguimiento")) {
-
-    // ❌ BLOQUEAR ACCESO A ADMIN
-    if (
-      path.includes("/ordenes") ||
-      path.includes("/clientes") ||
-      path.includes("/admin")
-    ) {
-      return NextResponse.redirect(
-        new URL("/seguimiento", req.url)
-      );
-    }
+  // ✅ RUTAS PÚBLICAS
+  if (
+    path.startsWith("/login") ||
+    path.startsWith("/seguimiento") ||
+    path.startsWith("/_next") ||
+    path.startsWith("/favicon.ico")
+  ) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  // ✅ LEER COOKIE
+  const auth =
+    req.cookies.get("shinhwa_admin");
+
+  // ✅ SI YA INICIÓ SESIÓN
+  if (
+    auth?.value === "123456"
+  ) {
+    return NextResponse.next();
+  }
+
+  // ❌ BLOQUEAR TODO
+  return NextResponse.redirect(
+    new URL("/login", req.url)
+  );
 }
+
+// ✅ ACTIVAR EN TODO EL SISTEMA
+export const config = {
+  matcher: ["/:path*"],
+};
