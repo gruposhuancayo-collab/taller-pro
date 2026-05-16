@@ -4,7 +4,8 @@ import { useState } from "react";
 
 export default function LoginPage() {
 
-  const [pass, setPass] = useState("");
+  const [pass, setPass] =
+    useState("");
 
   function entrar() {
 
@@ -16,17 +17,18 @@ export default function LoginPage() {
     document.cookie =
       "shinhwa_admin=123456; path=/";
 
-    window.location.href = "/ordenes";
+    window.location.href =
+      "/ordenes";
   }
 
   return (
     <div
       style={{
         minHeight: "100vh",
+        background: "#0f172a",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "#0f172a",
         padding: 20,
       }}
     >
@@ -37,14 +39,13 @@ export default function LoginPage() {
           background: "#111827",
           padding: 30,
           borderRadius: 20,
-          border: "1px solid #374151",
         }}
       >
         <h1
           style={{
             color: "white",
             textAlign: "center",
-            marginBottom: 25,
+            marginBottom: 20,
           }}
         >
           🔒 SHINHWA REPAIR
@@ -59,8 +60,8 @@ export default function LoginPage() {
           }
           style={{
             width: "100%",
-            padding: 16,
-            borderRadius: 12,
+            padding: 15,
+            borderRadius: 10,
             border: "none",
             fontSize: 18,
             boxSizing: "border-box",
@@ -72,14 +73,13 @@ export default function LoginPage() {
           style={{
             width: "100%",
             marginTop: 20,
-            padding: 16,
-            borderRadius: 12,
+            padding: 15,
+            borderRadius: 10,
             border: "none",
             background: "#2563eb",
             color: "white",
             fontWeight: "bold",
             fontSize: 18,
-            cursor: "pointer",
           }}
         >
           Entrar

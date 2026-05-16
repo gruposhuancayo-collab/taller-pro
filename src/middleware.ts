@@ -1,41 +1,42 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const PASSWORD = "123456";
+export function middleware(request: NextRequest) {
 
-export function middleware(req: NextRequest) {
+  const pathname =
+    request.nextUrl.pathname;
 
-  const path = req.nextUrl.pathname;
-
-  // ✅ DEJAR LIBRE SEGUIMIENTO
+  // ✅ CLIENTES
   if (
-    path.startsWith("/seguimiento")
+    pathname.startsWith("/seguimiento")
   ) {
     return NextResponse.next();
   }
 
-  // ✅ DEJAR LIBRE LOGIN
+  // ✅ LOGIN LIBRE
   if (
-    path.startsWith("/login")
+    pathname.startsWith("/login")
   ) {
     return NextResponse.next();
   }
 
-  // ✅ LEER COOKIE
+  // ✅ VERIFICAR COOKIE
   const auth =
-    req.cookies.get("shinhwa_admin");
+    request.cookies.get("shinhwa_admin");
 
-  // ✅ SI ESTÁ AUTENTICADO
-  if (auth?.value === PASSWORD) {
+  // ✅ SI ESTÁ LOGUEADO
+  if (
+    auth?.value === "123456"
+  ) {
     return NextResponse.next();
   }
 
-  // ❌ SI NO -> LOGIN
+  // ❌ BLOQUEAR TODO
   return NextResponse.redirect(
-    new URL("/login", req.url)
+    new URL("/login", request.url)
   );
 }
 
-// 🔥 IMPORTANTE
 export const config = {
   matcher: [
     "/ordenes/:path*",
