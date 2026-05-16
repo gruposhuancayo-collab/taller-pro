@@ -7,12 +7,15 @@ export default async function SeguimientoPage({
   params,
 }: any) {
 
-  const codigo = params.codigo;
+  const resolvedParams = await params;
+
+  const codigo = resolvedParams.codigo;
 
   const orden = await prisma.orden.findFirst({
     where: {
       codigo,
     },
+
     include: {
       cliente: true,
     },
@@ -25,119 +28,228 @@ export default async function SeguimientoPage({
   return (
     <div
       style={{
-        maxWidth: 700,
-        margin: "0 auto",
-        padding: 20,
+        minHeight: "100vh",
+        background: "#0f172a",
+        padding: 14,
+        color: "white",
+        fontFamily: "Arial, sans-serif",
       }}
     >
       <div
         style={{
-          background: "white",
-          borderRadius: 16,
-          padding: 20,
-          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          maxWidth: 700,
+          margin: "0 auto",
         }}
       >
-
-        <h1
-          style={{
-            fontSize: 30,
-            fontWeight: "bold",
-            marginBottom: 10,
-          }}
-        >
-          🛠️ SHINHWA REPAIR
-        </h1>
-
-        <p
-          style={{
-            color: "#666",
-            marginBottom: 20,
-          }}
-        >
-          Seguimiento de orden de servicio
-        </p>
-
+        {/* CARD PRINCIPAL */}
         <div
           style={{
-            background: "#f3f4f6",
-            padding: 15,
-            borderRadius: 12,
-            marginBottom: 20,
+            background: "#111827",
+            borderRadius: 20,
+            padding: 18,
+            border: "1px solid #374151",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
           }}
         >
-          <p>
-            <strong>Orden:</strong> {orden.codigo}
-          </p>
-
-          <p>
-            <strong>Cliente:</strong> {orden.cliente.nombre}
-          </p>
-
-          <p>
-            <strong>Equipo:</strong> {orden.producto}
-          </p>
-
-          <p>
-            <strong>Marca:</strong> {orden.marca}
-          </p>
-
-          <p>
-            <strong>Modelo:</strong> {orden.modelo || "-"}
-          </p>
-
-          <p>
-            <strong>Serie:</strong> {orden.serie || "-"}
-          </p>
-
-          <p>
-            <strong>Estado:</strong>{" "}
-            <span
-              style={{
-                color:
-                  orden.estado === "LISTO"
-                    ? "green"
-                    : "#f59e0b",
-                fontWeight: "bold",
-              }}
-            >
-              {orden.estado}
-            </span>
-          </p>
-        </div>
-
-        <div
-          style={{
-            marginBottom: 20,
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 22,
-              marginBottom: 10,
-            }}
-          >
-            🛠️ Problema reportado
-          </h2>
-
+          {/* LOGO */}
           <div
             style={{
-              background: "#fafafa",
-              padding: 15,
-              borderRadius: 12,
+              textAlign: "center",
+              marginBottom: 20,
             }}
           >
-            {orden.problema}
+            <div
+              style={{
+                fontSize: 32,
+                marginBottom: 8,
+              }}
+            >
+              🛠️
+            </div>
+
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 28,
+                fontWeight: "bold",
+                lineHeight: 1.2,
+              }}
+            >
+              SHINHWA REPAIR
+            </h1>
+
+            <p
+              style={{
+                color: "#9ca3af",
+                marginTop: 8,
+                fontSize: 15,
+                lineHeight: 1.5,
+              }}
+            >
+              Seguimiento de Servicio Técnico
+            </p>
+          </div>
+
+          {/* ESTADO */}
+          <div
+            style={{
+              background:
+                orden.estado === "LISTO"
+                  ? "#166534"
+                  : orden.estado === "REPARACION"
+                  ? "#92400e"
+                  : "#1e293b",
+
+              padding: 16,
+              borderRadius: 14,
+              textAlign: "center",
+              fontWeight: "bold",
+              fontSize: 18,
+              marginBottom: 20,
+            }}
+          >
+            📋 Estado actual: {orden.estado}
+          </div>
+
+          {/* DATOS */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+            }}
+          >
+            <div
+              style={{
+                background: "#1f2937",
+                padding: 14,
+                borderRadius: 12,
+              }}
+            >
+              <div
+                style={{
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  marginBottom: 5,
+                }}
+              >
+                NÚMERO DE ORDEN
+              </div>
+
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: "bold",
+                  wordBreak: "break-word",
+                }}
+              >
+                {orden.codigo}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#1f2937",
+                padding: 14,
+                borderRadius: 12,
+              }}
+            >
+              <div
+                style={{
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  marginBottom: 5,
+                }}
+              >
+                CLIENTE
+              </div>
+
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: "bold",
+                  wordBreak: "break-word",
+                }}
+              >
+                {orden.cliente?.nombre}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#1f2937",
+                padding: 14,
+                borderRadius: 12,
+              }}
+            >
+              <div
+                style={{
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  marginBottom: 5,
+                }}
+              >
+                EQUIPO
+              </div>
+
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: "bold",
+                  wordBreak: "break-word",
+                }}
+              >
+                {orden.producto}
+              </div>
+            </div>
+
+            <div
+              style={{
+                background: "#1f2937",
+                padding: 14,
+                borderRadius: 12,
+              }}
+            >
+              <div
+                style={{
+                  color: "#9ca3af",
+                  fontSize: 13,
+                  marginBottom: 5,
+                }}
+              >
+                MARCA Y MODELO
+              </div>
+
+              <div
+                style={{
+                  fontSize: 17,
+                  fontWeight: "bold",
+                  wordBreak: "break-word",
+                }}
+              >
+                {orden.marca} {orden.modelo || ""}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 📸 FOTOS */}
+        {/* FOTOS */}
         {orden.fotos?.length > 0 && (
-          <div>
+          <div
+            style={{
+              marginTop: 18,
+              background: "#111827",
+              borderRadius: 20,
+              padding: 18,
+              border: "1px solid #374151",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+            }}
+          >
             <h2
               style={{
+                marginTop: 0,
+                marginBottom: 18,
                 fontSize: 22,
-                marginBottom: 15,
               }}
             >
               📸 Fotos del equipo
@@ -147,28 +259,33 @@ export default async function SeguimientoPage({
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "repeat(auto-fit,minmax(150px,1fr))",
-                gap: 15,
+                  "repeat(auto-fit,minmax(140px,1fr))",
+                gap: 14,
               }}
             >
-              {orden.fotos.map((foto, i) => (
-                <a
-                  key={i}
-                  href={foto}
-                  target="_blank"
-                >
-                  <img
-                    src={foto}
+              {orden.fotos.map(
+                (foto: string, i: number) => (
+                  <a
+                    key={i}
+                    href={foto}
+                    target="_blank"
                     style={{
-                      width: "100%",
-                      height: 180,
-                      objectFit: "cover",
-                      borderRadius: 12,
-                      border: "1px solid #ddd",
+                      textDecoration: "none",
                     }}
-                  />
-                </a>
-              ))}
+                  >
+                    <img
+                      src={foto}
+                      style={{
+                        width: "100%",
+                        height: 160,
+                        objectFit: "cover",
+                        borderRadius: 14,
+                        border: "2px solid #374151",
+                      }}
+                    />
+                  </a>
+                )
+              )}
             </div>
           </div>
         )}
@@ -176,37 +293,87 @@ export default async function SeguimientoPage({
         {/* GARANTÍA */}
         <div
           style={{
-            marginTop: 30,
-            background: "#ecfeff",
-            padding: 15,
-            borderRadius: 12,
+            marginTop: 18,
+            background: "#111827",
+            borderRadius: 20,
+            padding: 18,
+            border: "1px solid #374151",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
           }}
         >
-          <h3
+          <h2
             style={{
-              marginBottom: 10,
+              marginTop: 0,
+              marginBottom: 14,
+              fontSize: 22,
             }}
           >
-            📋 Garantía
-          </h3>
+            📋 Garantía del servicio
+          </h2>
 
-          <p>
-            La reparación cuenta con garantía
-            limitada de 6 meses únicamente
-            sobre el servicio técnico realizado.
-          </p>
+          <div
+            style={{
+              color: "#e5e7eb",
+              fontSize: 15,
+              lineHeight: 1.8,
+            }}
+          >
+            <p>
+              ✅ La reparación realizada cuenta con
+              garantía limitada de 6 meses sobre el
+              servicio técnico efectuado.
+            </p>
 
-          <br />
+            <p>
+              ❌ La garantía quedará anulada si el
+              equipo presenta:
+            </p>
 
-          <p>
-            La garantía se invalida si el equipo
-            es manipulado por terceros,
-            presenta golpes, humedad,
-            sulfatación o daños ajenos a la
-            reparación original.
-          </p>
+            <ul
+              style={{
+                paddingLeft: 20,
+              }}
+            >
+              <li>Golpes</li>
+              <li>Humedad</li>
+              <li>Sulfatación</li>
+              <li>Manipulación por terceros</li>
+            </ul>
+
+            <p>
+              ⚠️ La garantía NO cubre:
+            </p>
+
+            <ul
+              style={{
+                paddingLeft: 20,
+              }}
+            >
+              <li>Pantalla</li>
+              <li>Batería</li>
+              <li>Cargador</li>
+              <li>Bisagras</li>
+              <li>Golpes</li>
+              <li>Daños eléctricos</li>
+            </ul>
+          </div>
         </div>
 
+        {/* FOOTER */}
+        <div
+          style={{
+            textAlign: "center",
+            color: "#94a3b8",
+            fontSize: 13,
+            marginTop: 20,
+            paddingBottom: 30,
+            lineHeight: 1.6,
+          }}
+        >
+          SHINHWA REPAIR © {new Date().getFullYear()}
+          <br />
+          Servicio técnico especializado
+        </div>
       </div>
     </div>
   );
