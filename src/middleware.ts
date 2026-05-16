@@ -6,9 +6,16 @@ export function middleware(req: NextRequest) {
 
   const path = req.nextUrl.pathname;
 
-  // ✅ PERMITIR SEGUIMIENTO
+  // ✅ DEJAR LIBRE SEGUIMIENTO
   if (
     path.startsWith("/seguimiento")
+  ) {
+    return NextResponse.next();
+  }
+
+  // ✅ DEJAR LIBRE LOGIN
+  if (
+    path.startsWith("/login")
   ) {
     return NextResponse.next();
   }
@@ -17,18 +24,23 @@ export function middleware(req: NextRequest) {
   const auth =
     req.cookies.get("shinhwa_admin");
 
-  // ✅ SI YA ESTÁ LOGUEADO
+  // ✅ SI ESTÁ AUTENTICADO
   if (auth?.value === PASSWORD) {
     return NextResponse.next();
   }
 
-  // ✅ LOGIN PAGE
-  if (path === "/login") {
-    return NextResponse.next();
-  }
-
-  // ❌ REDIRIGIR A LOGIN
+  // ❌ SI NO -> LOGIN
   return NextResponse.redirect(
     new URL("/login", req.url)
   );
 }
+
+// 🔥 IMPORTANTE
+export const config = {
+  matcher: [
+    "/ordenes/:path*",
+    "/clientes/:path*",
+    "/dashboard/:path*",
+    "/",
+  ],
+};
