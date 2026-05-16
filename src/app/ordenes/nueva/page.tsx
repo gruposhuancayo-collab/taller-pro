@@ -164,7 +164,7 @@ export default function NuevaOrdenPage() {
       // ✅ LINK FOTOS
       const linkFotos =
         data.id
-          ? `${window.location.origin}/ordenes/${data.id}`
+          ? `${window.location.origin}/seguimiento/${data.codigo}`
           : "";
 
       // ✅ MENSAJE PROFESIONAL
