@@ -101,6 +101,7 @@ export async function POST(req: Request) {
       ok: true,
       codigo: orden.codigo,
       telefono: cliente.celular || "",
+      id: orden.id,      
     });
 
   } catch (error) {

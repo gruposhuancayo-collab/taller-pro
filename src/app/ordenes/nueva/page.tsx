@@ -192,17 +192,21 @@ ${new Date().toLocaleString()}
 ━━━━━━━━━━━━━━━━━━
 📋 *TÉRMINOS DE GARANTÍA*
 
-✅ La reparación realizada cuenta con garantía limitada de *30 días* únicamente sobre el servicio técnico efectuado.
+✅ La reparación realizada cuenta con garantía limitada de *6 MESES* únicamente sobre el servicio técnico efectuado.
 
 ❌ La garantía quedará anulada si:
 
 • El equipo es manipulado por terceros.
 • Presenta golpes, humedad o sulfatación.
-• Se reinstala software no autorizado.
 • Se detectan daños distintos a la reparación original.
 
 ⚠️ La garantía NO cubre:
 pantalla, batería, cargador, bisagras, golpes, líquidos ni daños eléctricos externos.
+
+━━━━━━━━━━━━━━━━━━
+
+📷 *Fotos del equipo:*
+${window.location.origin}/ordenes/${data.id}
 
 ━━━━━━━━━━━━━━━━━━
 🙏 Gracias por confiar en
