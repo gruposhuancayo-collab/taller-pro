@@ -269,6 +269,7 @@ export default async function SeguimientoPage({
                     key={i}
                     href={foto}
                     target="_blank"
+		    rel="noopener noreferrer"
                     style={{
                       textDecoration: "none",
                     }}
@@ -281,6 +282,8 @@ export default async function SeguimientoPage({
                         objectFit: "cover",
                         borderRadius: 14,
                         border: "2px solid #374151",
+			cursor: "zoom-in",
+   		        transition: "0.3s",
                       }}
                     />
                   </a>
