@@ -1,3 +1,4 @@
+import BotonImprimir from "./BotonImprimir";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
@@ -385,108 +386,7 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                   )}
 
                   {/* IMPRIMIR */}
-                  <button
-                    onClick={() => {
-
-                      const ticket = `
-================================
-
-      SHINHWA REPAIR
-
-================================
-
-ORDEN DE SERVICIO
-
-Código:
-${o.codigo}
-
-Cliente:
-${o.cliente?.nombre || "-"}
-
-Equipo:
-${o.producto || "-"}
-
-Marca:
-${o.marca || "-"}
-
-Modelo:
-${o.modelo || "-"}
-
-Serie:
-${o.serie || "-"}
-
---------------------------------
-
-Estado:
-${o.estado || "-"}
-
-Fecha:
-${new Date(
-  o.createdAt
-).toLocaleString()}
-
-================================
-
-Gracias por preferir
-SHINHWA REPAIR
-
-================================
-`;
-
-                      const printWindow =
-                        window.open(
-                          "",
-                          "",
-                          "width=400,height=800"
-                        );
-
-                      printWindow?.document.write(`
-<html>
-<head>
-<title>Ticket</title>
-
-<style>
-body{
-  font-family: monospace;
-  width: 80mm;
-  padding: 10px;
-  font-size: 14px;
-}
-
-pre{
-  white-space: pre-wrap;
-}
-</style>
-
-</head>
-
-<body>
-
-<pre>${ticket}</pre>
-
-<script>
-window.print();
-window.close();
-</script>
-
-</body>
-</html>
-`);
-                    }}
-                    style={{
-                      background:
-                        "#f59e0b",
-                      color: "white",
-                      border: "none",
-                      borderRadius: 10,
-                      width: 50,
-                      cursor: "pointer",
-                      fontSize: 20,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    🖨️
-                  </button>
+                  <BotonImprimir orden={o} />
                 </div>
               </div>
             );
