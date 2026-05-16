@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import imageCompression from "browser-image-compression";
 
 export default function NuevaOrdenPage() {
+
   const [busqueda, setBusqueda] = useState("");
   const [clientes, setClientes] = useState<any[]>([]);
   const [clientesFiltrados, setClientesFiltrados] = useState<any[]>([]);
@@ -35,6 +36,7 @@ export default function NuevaOrdenPage() {
 
   async function cargarClientes() {
     try {
+
       const res = await fetch("/api/clientes");
       const data = await res.json();
 
@@ -46,6 +48,7 @@ export default function NuevaOrdenPage() {
   }
 
   function buscar(valor: string) {
+
     setBusqueda(valor);
 
     if (!valor.trim()) {
@@ -64,11 +67,13 @@ export default function NuevaOrdenPage() {
 
   // 📸 AGREGAR FOTO
   async function manejarFotos(e: any) {
+
     const file = e.target.files?.[0];
 
     if (!file) return;
 
     try {
+
       const compressedFile = await imageCompression(file, {
         maxSizeMB: 0.7,
         maxWidthOrHeight: 1280,
@@ -91,12 +96,15 @@ export default function NuevaOrdenPage() {
       e.target.value = "";
 
     } catch (error) {
+
       console.error(error);
+
       alert("Error procesando imagen");
     }
   }
 
   function eliminarFoto(index: number) {
+
     const nuevas = [...imagenes];
     nuevas.splice(index, 1);
 
@@ -109,6 +117,7 @@ export default function NuevaOrdenPage() {
   }
 
   function validar(form: FormData) {
+
     if (!clienteId) {
       setError("Selecciona un cliente");
       return false;
@@ -125,15 +134,18 @@ export default function NuevaOrdenPage() {
     }
 
     setError("");
+
     return true;
   }
 
   async function guardarOrden(e: any) {
+
     e.preventDefault();
 
     if (guardando) return;
 
     try {
+
       setGuardando(true);
 
       const form = new FormData(e.currentTarget);
@@ -148,6 +160,7 @@ export default function NuevaOrdenPage() {
         form.append("fotos", img);
       });
 
+      // ✅ GUARDAR
       const res = await fetch("/api/orden", {
         method: "POST",
         body: form,
@@ -156,16 +169,17 @@ export default function NuevaOrdenPage() {
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
+
         setError(data.error || "Error guardando orden");
+
         setGuardando(false);
+
         return;
       }
 
-      // ✅ LINK FOTOS
+      // ✅ LINK CLIENTE
       const linkFotos =
-        data.id
-          ? `${window.location.origin}/seguimiento/${data.codigo}`
-          : "";
+        `${window.location.origin}/seguimiento/${data.codigo}`;
 
       // ✅ MENSAJE PROFESIONAL
       const msg = `
@@ -219,7 +233,7 @@ sobre el servicio técnico realizado.
 
 ━━━━━━━━━━━━━━━━━━
 
-📷 *Ver fotos y detalle:*
+📷 *Ver fotos y seguimiento:*
 ${linkFotos}
 
 ━━━━━━━━━━━━━━━━━━
@@ -228,25 +242,29 @@ ${linkFotos}
 *SHINHWA REPAIR* 🔧
 `;
 
-      // ✅ WHATSAPP
-      try {
-        window.open(
-          `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`,
-          "_blank"
-        );
-      } catch (err) {
-        console.error(err);
-      }
+      // ✅ ABRIR WHATSAPP PRIMERO
+      const whatsappUrl =
+        `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`;
+
+      window.open(
+        whatsappUrl,
+        "_blank"
+      );
+
+      // ⏳ ESPERAR UN POCO
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1200)
+      );
 
       // 🖨️ TICKET 80MM
       const ticket = `
 ================================
 
-        SHINHWA REPAIR
+       SHINHWA REPAIR
 
 ================================
 
-ORDEN DE SERVICIO
+      ORDEN DE SERVICIO
 
 Código:
 ${data.codigo}
@@ -274,21 +292,27 @@ ${form.get("problema")}
 
 --------------------------------
 
-Fotos registradas:
+Fotos:
 ${imagenes.length}
 
 Fecha:
 ${new Date().toLocaleString()}
 
-================================
+--------------------------------
 
 GARANTÍA:
 6 MESES
 
-No válida por:
+NO CUBRE:
 Golpes
+Pantalla
 Líquidos
 Manipulación externa
+
+--------------------------------
+
+Seguimiento:
+${linkFotos}
 
 ================================
 
@@ -306,10 +330,13 @@ SHINHWA REPAIR
 
       printWindow?.document.write(`
 <html>
+
 <head>
+
 <title>Ticket</title>
 
 <style>
+
 body{
   font-family: monospace;
   width: 80mm;
@@ -320,6 +347,7 @@ body{
 pre{
   white-space: pre-wrap;
 }
+
 </style>
 
 </head>
@@ -329,22 +357,37 @@ pre{
 <pre>${ticket}</pre>
 
 <script>
-window.print();
-window.close();
+
+window.onload = function(){
+
+  window.print();
+
+  setTimeout(() => {
+    window.close();
+  }, 500);
+
+}
+
 </script>
 
 </body>
+
 </html>
 `);
+
+      printWindow?.document.close();
 
       // ✅ LIMPIAR
       setImagenes([]);
       setPreview([]);
 
       // ✅ REDIRECCIONAR
-      window.location.href = "/ordenes?ok=1";
+      setTimeout(() => {
+        window.location.href = "/ordenes?ok=1";
+      }, 1500);
 
     } catch (err) {
+
       console.error(err);
 
       setError("Error de conexión");
@@ -425,7 +468,9 @@ window.close();
                 }}
               >
                 <strong>{c.nombre}</strong>
+
                 <br />
+
                 DNI: {c.dni}
               </div>
             ))}
@@ -487,6 +532,7 @@ window.close();
           }}
         />
 
+        {/* 📸 FOTO */}
         <label
           style={{
             marginTop: 15,
@@ -512,6 +558,7 @@ window.close();
           />
         </label>
 
+        {/* 🖼️ PREVIEW */}
         <div
           style={{
             display: "flex",
@@ -561,6 +608,7 @@ window.close();
           ))}
         </div>
 
+        {/* BOTÓN */}
         <button
           type="submit"
           disabled={guardando}

@@ -166,128 +166,204 @@ export default async function OrdenesPage({
             gap: 10,
           }}
         >
-          {ordenes.map((o) => (
-            <div
-              key={o.id}
-              style={{
-                background: "#111827",
-                padding: 14,
-                borderRadius: 12,
-                border: "1px solid #374151",
-              }}
-            >
-              {/* FILA */}
+          {ordenes.map((o) => {
+
+            // ✅ MENSAJE WHATSAPP
+            const mensaje = `
+🛠️ SHINHWA REPAIR
+
+📄 Orden:
+${o.codigo}
+
+👤 Cliente:
+${o.cliente?.nombre || "-"}
+
+💻 Equipo:
+${o.producto || "-"}
+
+🏷️ Marca:
+${o.marca || "-"}
+
+🧩 Modelo:
+${o.modelo || "-"}
+
+🔢 Serie:
+${o.serie || "-"}
+
+📋 Estado:
+${o.estado || "-"}
+
+📷 Seguimiento:
+${process.env.NEXT_PUBLIC_APP_URL}/seguimiento/${o.codigo}
+
+Gracias por confiar en SHINHWA REPAIR 🔧
+`;
+
+            const telefono =
+              o.cliente?.telefono || "";
+
+            const wa =
+              `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`;
+
+            return (
               <div
+                key={o.id}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  alignItems: "center",
+                  background: "#111827",
+                  padding: 14,
+                  borderRadius: 12,
+                  border: "1px solid #374151",
                 }}
               >
-                {/* INFO */}
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: 17,
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {o.cliente?.nombre}
-                  </div>
-
-                  <div
-                    style={{
-                      color: "#d1d5db",
-                      fontSize: 14,
-                      marginTop: 3,
-                    }}
-                  >
-                    {o.marca} {o.modelo || ""}
-                  </div>
-
-                  <div
-                    style={{
-                      color: "#9ca3af",
-                      fontSize: 12,
-                      marginTop: 3,
-                    }}
-                  >
-                    {o.codigo}
-                  </div>
-                </div>
-
-                {/* ESTADO */}
+                {/* FILA */}
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    gap: 5,
+                    justifyContent: "space-between",
+                    gap: 10,
+                    alignItems: "center",
                   }}
                 >
+                  {/* INFO */}
                   <div
                     style={{
-                      padding: "5px 10px",
-                      borderRadius: 999,
-                      fontSize: 11,
-                      fontWeight: "bold",
-                      background:
-                        o.estado === "LISTO"
-                          ? "#166534"
-                          : o.estado === "REPARACION"
-                          ? "#92400e"
-                          : "#334155",
-                      color: "white",
+                      flex: 1,
+                      minWidth: 0,
                     }}
                   >
-                    {o.estado}
+                    <div
+                      style={{
+                        color: "white",
+                        fontWeight: "bold",
+                        fontSize: 17,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {o.cliente?.nombre}
+                    </div>
+
+                    <div
+                      style={{
+                        color: "#d1d5db",
+                        fontSize: 14,
+                        marginTop: 3,
+                      }}
+                    >
+                      {o.marca} {o.modelo || ""}
+                    </div>
+
+                    <div
+                      style={{
+                        color: "#9ca3af",
+                        fontSize: 12,
+                        marginTop: 3,
+                      }}
+                    >
+                      {o.codigo}
+                    </div>
                   </div>
 
+                  {/* ESTADO */}
                   <div
                     style={{
                       display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
                       gap: 5,
-                      fontSize: 18,
                     }}
                   >
-                    {(o.deuda || 0) > 0 && <span>💳</span>}
+                    <div
+                      style={{
+                        padding: "5px 10px",
+                        borderRadius: 999,
+                        fontSize: 11,
+                        fontWeight: "bold",
+                        background:
+                          o.estado === "LISTO"
+                            ? "#166534"
+                            : o.estado === "REPARACION"
+                            ? "#92400e"
+                            : "#334155",
+                        color: "white",
+                      }}
+                    >
+                      {o.estado}
+                    </div>
 
-                    {o.fotos?.length > 0 && <span>📸</span>}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 5,
+                        fontSize: 18,
+                      }}
+                    >
+                      {(o.deuda || 0) > 0 && <span>💳</span>}
+
+                      {o.fotos?.length > 0 && <span>📸</span>}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* BOTÓN */}
-              <Link href={`/ordenes/${o.id}`}>
-                <button
+                {/* BOTONES */}
+                <div
                   style={{
+                    display: "flex",
+                    gap: 10,
                     marginTop: 12,
-                    background: "#2563eb",
-                    color: "white",
-                    padding: "10px",
-                    border: "none",
-                    borderRadius: 10,
-                    cursor: "pointer",
-                    width: "100%",
-                    fontSize: 14,
-                    fontWeight: "bold",
                   }}
                 >
-                  🔍 Ver detalle
-                </button>
-              </Link>
-            </div>
-          ))}
+                  {/* DETALLE */}
+                  <Link
+                    href={`/ordenes/${o.id}`}
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    <button
+                      style={{
+                        background: "#2563eb",
+                        color: "white",
+                        padding: "10px",
+                        border: "none",
+                        borderRadius: 10,
+                        cursor: "pointer",
+                        width: "100%",
+                        fontSize: 14,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      🔍 Ver detalle
+                    </button>
+                  </Link>
+
+                  {/* WHATSAPP */}
+                  {telefono && (
+                    <a
+                      href={wa}
+                      target="_blank"
+                    >
+                      <button
+                        style={{
+                          background: "#16a34a",
+                          color: "white",
+                          padding: "10px 14px",
+                          border: "none",
+                          borderRadius: 10,
+                          cursor: "pointer",
+                          fontSize: 20,
+                          fontWeight: "bold",
+                        }}
+                      >
+                        🟢
+                      </button>
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
