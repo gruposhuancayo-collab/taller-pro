@@ -7,58 +7,28 @@ export default function BotonImprimir({
   function imprimir() {
 
     const ticket = `
-================================
-
-      SHINHWA REPAIR
-
-================================
-
-ORDEN DE SERVICIO
-
-Código:
-${orden.codigo}
-
-Cliente:
-${orden.cliente?.nombre || "-"}
-
-Equipo:
-${orden.producto || "-"}
-
-Marca:
-${orden.marca || "-"}
-
-Modelo:
-${orden.modelo || "-"}
-
-Serie:
-${orden.serie || "-"}
-
---------------------------------
-
-Estado:
-${orden.estado || "-"}
-
-Fecha:
-${new Date(
+${orden.codigo} ${new Date(
   orden.createdAt
-).toLocaleString()}
+).toLocaleDateString()}
 
-================================
+${orden.cliente?.nombre || ""}
+${orden.cliente?.celular || ""}
 
-Gracias por preferir
-SHINHWA REPAIR
+${orden.producto || ""}
+██${orden.problema || ""}██
 
-================================
+PRECIO:_______
+OBS:__________
+______________
 `;
 
-    const printWindow =
-      window.open(
-        "",
-        "",
-        "width=400,height=800"
-      );
+    const ventana = window.open(
+      "",
+      "",
+      "width=300,height=600"
+    );
 
-    printWindow?.document.write(`
+    ventana?.document.write(`
 <html>
 <head>
 <title>Ticket</title>
@@ -67,12 +37,22 @@ SHINHWA REPAIR
 body{
   font-family: monospace;
   width: 80mm;
-  padding: 10px;
-  font-size: 14px;
+  margin:0;
+  padding:4px;
+  font-size:15px;
+  font-weight:bold;
+  line-height:1.1;
 }
 
 pre{
-  white-space: pre-wrap;
+  white-space:pre-wrap;
+  margin:0;
+}
+
+@media print{
+  body{
+    margin:0;
+  }
 }
 </style>
 
