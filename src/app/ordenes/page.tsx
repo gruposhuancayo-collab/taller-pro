@@ -7,60 +7,63 @@ export default async function OrdenesPage({
   searchParams,
 }: any) {
 
-  const resolvedSearchParams = await searchParams;
+  const resolvedSearchParams =
+    await searchParams;
 
-  const q = resolvedSearchParams?.q || "";
+  const q =
+    resolvedSearchParams?.q || "";
 
-  const ordenes = await prisma.orden.findMany({
-    where: {
-      OR: [
-        {
-          codigo: {
-            contains: q,
-            mode: "insensitive",
-          },
-        },
-
-        {
-          marca: {
-            contains: q,
-            mode: "insensitive",
-          },
-        },
-
-        {
-          modelo: {
-            contains: q,
-            mode: "insensitive",
-          },
-        },
-
-        {
-          serie: {
-            contains: q,
-            mode: "insensitive",
-          },
-        },
-
-        {
-          cliente: {
-            nombre: {
+  const ordenes =
+    await prisma.orden.findMany({
+      where: {
+        OR: [
+          {
+            codigo: {
               contains: q,
               mode: "insensitive",
             },
           },
-        },
-      ],
-    },
 
-    include: {
-      cliente: true,
-    },
+          {
+            marca: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
 
-    orderBy: {
-      id: "desc",
-    },
-  });
+          {
+            modelo: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
+
+          {
+            serie: {
+              contains: q,
+              mode: "insensitive",
+            },
+          },
+
+          {
+            cliente: {
+              nombre: {
+                contains: q,
+                mode: "insensitive",
+              },
+            },
+          },
+        ],
+      },
+
+      include: {
+        cliente: true,
+      },
+
+      orderBy: {
+        id: "desc",
+      },
+    });
 
   return (
     <div
@@ -74,7 +77,8 @@ export default async function OrdenesPage({
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent:
+            "space-between",
           alignItems: "center",
           gap: 10,
           marginBottom: 15,
@@ -113,7 +117,9 @@ export default async function OrdenesPage({
         <input
           name="q"
           placeholder="🔍 Buscar cliente o código"
-          defaultValue={resolvedSearchParams?.q || ""}
+          defaultValue={
+            resolvedSearchParams?.q || ""
+          }
           style={{
             width: "100%",
             padding: 14,
@@ -212,14 +218,16 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                   background: "#111827",
                   padding: 14,
                   borderRadius: 12,
-                  border: "1px solid #374151",
+                  border:
+                    "1px solid #374151",
                 }}
               >
                 {/* FILA */}
                 <div
                   style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent:
+                      "space-between",
                     gap: 10,
                     alignItems: "center",
                   }}
@@ -238,7 +246,8 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                         fontSize: 17,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        textOverflow:
+                          "ellipsis",
                       }}
                     >
                       {o.cliente?.nombre}
@@ -251,7 +260,8 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                         marginTop: 3,
                       }}
                     >
-                      {o.marca} {o.modelo || ""}
+                      {o.marca}{" "}
+                      {o.modelo || ""}
                     </div>
 
                     <div
@@ -269,21 +279,27 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                   <div
                     style={{
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-end",
+                      flexDirection:
+                        "column",
+                      alignItems:
+                        "flex-end",
                       gap: 5,
                     }}
                   >
                     <div
                       style={{
-                        padding: "5px 10px",
+                        padding:
+                          "5px 10px",
                         borderRadius: 999,
                         fontSize: 11,
-                        fontWeight: "bold",
+                        fontWeight:
+                          "bold",
                         background:
-                          o.estado === "LISTO"
+                          o.estado ===
+                          "LISTO"
                             ? "#166534"
-                            : o.estado === "REPARACION"
+                            : o.estado ===
+                              "REPARACION"
                             ? "#92400e"
                             : "#334155",
                         color: "white",
@@ -299,9 +315,11 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                         fontSize: 18,
                       }}
                     >
-                      {(o.deuda || 0) > 0 && <span>💳</span>}
+                      {(o.deuda || 0) >
+                        0 && <span>💳</span>}
 
-                      {o.fotos?.length > 0 && <span>📸</span>}
+                      {o.fotos?.length >
+                        0 && <span>📸</span>}
                     </div>
                   </div>
                 </div>
@@ -310,7 +328,7 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                 <div
                   style={{
                     display: "flex",
-                    gap: 10,
+                    gap: 8,
                     marginTop: 12,
                   }}
                 >
@@ -323,7 +341,8 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                   >
                     <button
                       style={{
-                        background: "#2563eb",
+                        background:
+                          "#2563eb",
                         color: "white",
                         padding: "10px",
                         border: "none",
@@ -331,7 +350,8 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                         cursor: "pointer",
                         width: "100%",
                         fontSize: 14,
-                        fontWeight: "bold",
+                        fontWeight:
+                          "bold",
                       }}
                     >
                       🔍 Ver detalle
@@ -346,20 +366,127 @@ Gracias por confiar en SHINHWA REPAIR 🔧
                     >
                       <button
                         style={{
-                          background: "#16a34a",
+                          background:
+                            "#16a34a",
                           color: "white",
-                          padding: "10px 14px",
+                          padding:
+                            "10px 14px",
                           border: "none",
                           borderRadius: 10,
                           cursor: "pointer",
                           fontSize: 20,
-                          fontWeight: "bold",
+                          fontWeight:
+                            "bold",
                         }}
                       >
                         🟢
                       </button>
                     </a>
                   )}
+
+                  {/* IMPRIMIR */}
+                  <button
+                    onClick={() => {
+
+                      const ticket = `
+================================
+
+      SHINHWA REPAIR
+
+================================
+
+ORDEN DE SERVICIO
+
+Código:
+${o.codigo}
+
+Cliente:
+${o.cliente?.nombre || "-"}
+
+Equipo:
+${o.producto || "-"}
+
+Marca:
+${o.marca || "-"}
+
+Modelo:
+${o.modelo || "-"}
+
+Serie:
+${o.serie || "-"}
+
+--------------------------------
+
+Estado:
+${o.estado || "-"}
+
+Fecha:
+${new Date(
+  o.createdAt
+).toLocaleString()}
+
+================================
+
+Gracias por preferir
+SHINHWA REPAIR
+
+================================
+`;
+
+                      const printWindow =
+                        window.open(
+                          "",
+                          "",
+                          "width=400,height=800"
+                        );
+
+                      printWindow?.document.write(`
+<html>
+<head>
+<title>Ticket</title>
+
+<style>
+body{
+  font-family: monospace;
+  width: 80mm;
+  padding: 10px;
+  font-size: 14px;
+}
+
+pre{
+  white-space: pre-wrap;
+}
+</style>
+
+</head>
+
+<body>
+
+<pre>${ticket}</pre>
+
+<script>
+window.print();
+window.close();
+</script>
+
+</body>
+</html>
+`);
+                    }}
+                    style={{
+                      background:
+                        "#f59e0b",
+                      color: "white",
+                      border: "none",
+                      borderRadius: 10,
+                      width: 50,
+                      cursor: "pointer",
+                      fontSize: 20,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    🖨️
+                  </button>
                 </div>
               </div>
             );
