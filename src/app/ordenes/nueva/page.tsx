@@ -162,18 +162,66 @@ export default function NuevaOrdenPage() {
         return;
       }
 
-      const msg =
-        `Hola, tu equipo fue registrado correctamente ✅\n\n` +
-        `Código: ${data.codigo}`;
+      // ✅ MENSAJE PROFESIONAL
+      const msg = `
+🛠️ *SHINHWA REPAIR*
+━━━━━━━━━━━━━━━━━━
 
+✅ *ORDEN DE SERVICIO REGISTRADA*
+
+📄 *N° Orden:* ${data.codigo}
+
+👤 *Cliente:* ${clienteNombre}
+
+💻 *Equipo:* ${form.get("producto")}
+
+🏷️ *Marca:* ${form.get("marca")}
+
+🧩 *Modelo:* ${form.get("modelo") || "-"}
+
+🔢 *Serie:* ${form.get("serie") || "-"}
+
+🛠️ *Falla reportada:*
+${form.get("problema")}
+
+📸 *Fotos registradas:* ${imagenes.length}
+
+📅 *Fecha de ingreso:*
+${new Date().toLocaleString()}
+
+━━━━━━━━━━━━━━━━━━
+📋 *TÉRMINOS DE GARANTÍA*
+
+✅ La reparación realizada cuenta con garantía limitada de *30 días* únicamente sobre el servicio técnico efectuado.
+
+❌ La garantía quedará anulada si:
+
+• El equipo es manipulado por terceros.
+• Presenta golpes, humedad o sulfatación.
+• Se reinstala software no autorizado.
+• Se detectan daños distintos a la reparación original.
+
+⚠️ La garantía NO cubre:
+pantalla, batería, cargador, bisagras, golpes, líquidos ni daños eléctricos externos.
+
+━━━━━━━━━━━━━━━━━━
+🙏 Gracias por confiar en
+
+*SHINHWA REPAIR* 🔧
+`;
+
+      // ✅ ABRIR WHATSAPP
       window.open(
-        `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`
+        `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`,
+        "_blank"
       );
 
+      // ✅ LIMPIAR
       setImagenes([]);
       setPreview([]);
 
-      window.location.href = "/ordenes";
+      // ✅ REDIRECCIONAR
+      window.location.href = "/ordenes?ok=1";
 
     } catch (err) {
       console.error(err);
@@ -220,6 +268,7 @@ export default function NuevaOrdenPage() {
 
       <form onSubmit={guardarOrden}>
 
+        {/* BUSCADOR */}
         <input
           value={busqueda}
           onChange={(e) => buscar(e.target.value)}
@@ -227,6 +276,7 @@ export default function NuevaOrdenPage() {
           style={inputStyle}
         />
 
+        {/* CLIENTES */}
         {clientesFiltrados.length > 0 && (
           <div
             style={{
@@ -263,6 +313,7 @@ export default function NuevaOrdenPage() {
           </div>
         )}
 
+        {/* CLIENTE */}
         {clienteNombre && (
           <div
             style={{
@@ -285,6 +336,7 @@ export default function NuevaOrdenPage() {
           value={clienteId}
         />
 
+        {/* CAMPOS */}
         <input
           name="producto"
           defaultValue="Laptop"
@@ -318,6 +370,7 @@ export default function NuevaOrdenPage() {
           }}
         />
 
+        {/* BOTÓN FOTO */}
         <label
           style={{
             marginTop: 15,
@@ -343,6 +396,7 @@ export default function NuevaOrdenPage() {
           />
         </label>
 
+        {/* PREVIEW */}
         <div
           style={{
             display: "flex",
@@ -392,6 +446,7 @@ export default function NuevaOrdenPage() {
           ))}
         </div>
 
+        {/* BOTÓN */}
         <button
           type="submit"
           disabled={guardando}
