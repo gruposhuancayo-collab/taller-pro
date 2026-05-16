@@ -80,9 +80,8 @@ export default function NuevaOrdenPage() {
         compressedFile as File,
       ]);
 
-      const nuevaPreview = URL.createObjectURL(
-        compressedFile
-      );
+      const nuevaPreview =
+        URL.createObjectURL(compressedFile);
 
       setPreview((prev) => [
         ...prev,
@@ -162,6 +161,12 @@ export default function NuevaOrdenPage() {
         return;
       }
 
+      // ✅ LINK FOTOS
+      const linkFotos =
+        data.id
+          ? `${window.location.origin}/ordenes/${data.id}`
+          : "";
+
       // ✅ MENSAJE PROFESIONAL
       const msg = `
 🛠️ *SHINHWA REPAIR*
@@ -192,21 +197,30 @@ ${new Date().toLocaleString()}
 ━━━━━━━━━━━━━━━━━━
 📋 *TÉRMINOS DE GARANTÍA*
 
-✅ La reparación realizada cuenta con garantía limitada de *6 MESES* únicamente sobre el servicio técnico efectuado.
+✅ Garantía limitada de *6 MESES*
+sobre el servicio técnico realizado.
 
 ❌ La garantía quedará anulada si:
 
-• El equipo es manipulado por terceros.
-• Presenta golpes, humedad o sulfatación.
-• Se detectan daños distintos a la reparación original.
+• El equipo es manipulado por terceros
+• Presenta golpes o humedad
+• Presenta sulfatación
+• Tiene daños distintos a la reparación
 
 ⚠️ La garantía NO cubre:
-pantalla, batería, cargador, bisagras, golpes, líquidos ni daños eléctricos externos.
+
+• Pantalla
+• Batería
+• Cargador
+• Bisagras
+• Golpes
+• Líquidos
+• Cortos eléctricos
 
 ━━━━━━━━━━━━━━━━━━
 
-📷 *Fotos del equipo:*
-${window.location.origin}/ordenes/${data.id}
+📷 *Ver fotos y detalle:*
+${linkFotos}
 
 ━━━━━━━━━━━━━━━━━━
 🙏 Gracias por confiar en
@@ -214,11 +228,114 @@ ${window.location.origin}/ordenes/${data.id}
 *SHINHWA REPAIR* 🔧
 `;
 
-      // ✅ ABRIR WHATSAPP
-      window.open(
-        `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`,
-        "_blank"
+      // ✅ WHATSAPP
+      try {
+        window.open(
+          `https://wa.me/51${data.telefono}?text=${encodeURIComponent(msg)}`,
+          "_blank"
+        );
+      } catch (err) {
+        console.error(err);
+      }
+
+      // 🖨️ TICKET 80MM
+      const ticket = `
+================================
+
+        SHINHWA REPAIR
+
+================================
+
+ORDEN DE SERVICIO
+
+Código:
+${data.codigo}
+
+Cliente:
+${clienteNombre}
+
+Equipo:
+${form.get("producto")}
+
+Marca:
+${form.get("marca")}
+
+Modelo:
+${form.get("modelo") || "-"}
+
+Serie:
+${form.get("serie") || "-"}
+
+--------------------------------
+
+FALLA REPORTADA
+
+${form.get("problema")}
+
+--------------------------------
+
+Fotos registradas:
+${imagenes.length}
+
+Fecha:
+${new Date().toLocaleString()}
+
+================================
+
+GARANTÍA:
+6 MESES
+
+No válida por:
+Golpes
+Líquidos
+Manipulación externa
+
+================================
+
+Gracias por preferir
+SHINHWA REPAIR
+
+================================
+`;
+
+      const printWindow = window.open(
+        "",
+        "",
+        "width=400,height=800"
       );
+
+      printWindow?.document.write(`
+<html>
+<head>
+<title>Ticket</title>
+
+<style>
+body{
+  font-family: monospace;
+  width: 80mm;
+  padding: 10px;
+  font-size: 14px;
+}
+
+pre{
+  white-space: pre-wrap;
+}
+</style>
+
+</head>
+
+<body>
+
+<pre>${ticket}</pre>
+
+<script>
+window.print();
+window.close();
+</script>
+
+</body>
+</html>
+`);
 
       // ✅ LIMPIAR
       setImagenes([]);
@@ -272,7 +389,6 @@ ${window.location.origin}/ordenes/${data.id}
 
       <form onSubmit={guardarOrden}>
 
-        {/* BUSCADOR */}
         <input
           value={busqueda}
           onChange={(e) => buscar(e.target.value)}
@@ -280,7 +396,6 @@ ${window.location.origin}/ordenes/${data.id}
           style={inputStyle}
         />
 
-        {/* CLIENTES */}
         {clientesFiltrados.length > 0 && (
           <div
             style={{
@@ -317,7 +432,6 @@ ${window.location.origin}/ordenes/${data.id}
           </div>
         )}
 
-        {/* CLIENTE */}
         {clienteNombre && (
           <div
             style={{
@@ -340,7 +454,6 @@ ${window.location.origin}/ordenes/${data.id}
           value={clienteId}
         />
 
-        {/* CAMPOS */}
         <input
           name="producto"
           defaultValue="Laptop"
@@ -374,7 +487,6 @@ ${window.location.origin}/ordenes/${data.id}
           }}
         />
 
-        {/* BOTÓN FOTO */}
         <label
           style={{
             marginTop: 15,
@@ -400,7 +512,6 @@ ${window.location.origin}/ordenes/${data.id}
           />
         </label>
 
-        {/* PREVIEW */}
         <div
           style={{
             display: "flex",
@@ -450,7 +561,6 @@ ${window.location.origin}/ordenes/${data.id}
           ))}
         </div>
 
-        {/* BOTÓN */}
         <button
           type="submit"
           disabled={guardando}
