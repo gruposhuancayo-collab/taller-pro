@@ -6,10 +6,28 @@ export default function BotonImprimir({
 
   function imprimir() {
 
+    const ticket = `
+${orden.cliente?.nombre || ""}
+Cel: ${orden.cliente?.celular || ""}
+
+${orden.marca || ""} ${orden.modelo || ""}
+S/N: ${orden.serie || "-"}
+
+${orden.problema || "-"}
+
+_______________________________
+PRECIO:
+
+_______________________________
+OBS:
+
+
+`;
+
     const ventana = window.open(
       "",
-      "PRINT",
-      "height=600,width=400"
+      "",
+      "width=320,height=600"
     );
 
     if (!ventana) return;
@@ -17,108 +35,102 @@ export default function BotonImprimir({
     ventana.document.write(`
 <html>
 <head>
-<title>PRINT</title>
+<title>Print</title>
 
 <style>
 
 @page{
   size:80mm auto;
-  margin:0;
+  margin:2mm;
 }
 
 html,body{
   width:80mm;
   margin:0;
   padding:0;
+  font-family:Arial;
+  font-size:13px;
 }
 
 body{
-  font-family: monospace;
-  font-size:18px;
-  font-weight:bold;
-  line-height:1.1;
-  padding:6px;
+  padding:2mm;
 }
 
-.contenido{
+.ticket{
   width:100%;
 }
 
-.texto{
-  margin-top:2px;
-  margin-bottom:2px;
+.nombre{
+  font-size:15px;
+  font-weight:bold;
+}
+
+.problemaTitulo{
+  font-weight:bold;
+  font-size:14px;
 }
 
 .problema{
-  margin-top:4px;
-  margin-bottom:4px;
-  background:black;
-  color:white;
-  padding:4px;
+  font-size:15px;
   font-weight:bold;
-  word-break:break-word;
 }
 
 .linea{
-  margin-top:6px;
+  margin-top:8px;
 }
 
 </style>
 </head>
 
-<body>
+<body onload="window.print();setTimeout(()=>window.close(),500)">
 
-<div class="contenido">
+<div class="ticket">
 
-<div class="texto">
-${orden.codigo} - ${new Date(
-      orden.createdAt
-    ).toLocaleDateString()}
-</div>
-
-<div class="texto">
+<div class="nombre">
 ${orden.cliente?.nombre || ""}
 </div>
 
-<div class="texto">
-${orden.cliente?.celular || ""}
+<div>
+Cel: ${orden.cliente?.celular || ""}
 </div>
 
-<div class="texto">
-${orden.producto || ""}
+<div>
+${orden.marca || ""} ${orden.modelo || ""}
+</div>
+
+<div>
+S/N: ${orden.serie || "-"}
+</div>
+
+<div class="linea problemaTitulo">
+PROBLEMA DEL EQUIPO
 </div>
 
 <div class="problema">
-${orden.problema || ""}
+${orden.problema || "-"}
 </div>
 
 <div class="linea">
-PRECIO: ______________________
+_______________________________
+</div>
+
+<div>
+PRECIO:
 </div>
 
 <div class="linea">
-OBS: _________________________
+_______________________________
 </div>
 
-<div class="linea">
-______________________________
+<div>
+OBS:
 </div>
 
+<br>
+<br>
+<br>
+
 </div>
-
-<script>
-
-window.focus();
-
-setTimeout(() => {
-  window.print();
-}, 300);
-
-setTimeout(() => {
-  window.close();
-}, 1000);
-
-</script>
 
 </body>
 </html>
