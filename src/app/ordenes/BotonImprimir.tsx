@@ -15,6 +15,7 @@ ${orden.cliente?.nombre || ""}
 ${orden.cliente?.celular || ""}
 
 ${orden.producto || ""}
+
 ██${orden.problema || ""}██
 
 PRECIO:_______
@@ -25,7 +26,7 @@ ______________
     const ventana = window.open(
       "",
       "",
-      "width=300,height=600"
+      "width=320,height=600"
     );
 
     ventana?.document.write(`
@@ -34,26 +35,34 @@ ______________
 <title>Ticket</title>
 
 <style>
+
+@page{
+  size: 80mm auto;
+  margin: 0;
+}
+
+html,body{
+  width:80mm;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+}
+
 body{
   font-family: monospace;
-  width: 80mm;
-  margin:0;
-  padding:4px;
   font-size:15px;
   font-weight:bold;
   line-height:1.1;
+  padding:4px;
+  display:inline-block;
 }
 
 pre{
-  white-space:pre-wrap;
   margin:0;
+  white-space:pre-wrap;
+  word-break:break-word;
 }
 
-@media print{
-  body{
-    margin:0;
-  }
-}
 </style>
 
 </head>
@@ -63,8 +72,12 @@ pre{
 <pre>${ticket}</pre>
 
 <script>
-window.print();
-window.close();
+window.onload = () => {
+  window.print();
+  setTimeout(() => {
+    window.close();
+  }, 500);
+};
 </script>
 
 </body>
