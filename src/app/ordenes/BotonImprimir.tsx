@@ -7,54 +7,62 @@ export default function BotonImprimir({
   function imprimir() {
 
     const ticket = `
-${orden.codigo} ${new Date(
+${orden.codigo}    ${new Date(
   orden.createdAt
 ).toLocaleDateString()}
 
+CLIENTE:
 ${orden.cliente?.nombre || ""}
+
+CEL:
 ${orden.cliente?.celular || ""}
 
+EQUIPO:
 ${orden.producto || ""}
 
-██${orden.problema || ""}██
+████████████████████████
+${orden.problema || ""}
+████████████████████████
 
-PRECIO:_______
-OBS:__________
-______________
+PRECIO: __________________
+
+OBS: ____________________
+
+_________________________
+
 `;
-
     const ventana = window.open(
       "",
-      "",
-      "width=320,height=600"
+      "PRINT",
+      "height=600,width=400"
     );
 
-    ventana?.document.write(`
+    if (!ventana) return;
+
+    ventana.document.write(`
 <html>
 <head>
-<title>Ticket</title>
+<title>PRINT</title>
 
 <style>
 
 @page{
-  size: 80mm auto;
-  margin: 0;
+  size:80mm auto;
+  margin:0;
 }
 
 html,body{
   width:80mm;
   margin:0;
   padding:0;
-  overflow:hidden;
 }
 
 body{
   font-family: monospace;
-  font-size:15px;
+  font-size:18px;
   font-weight:bold;
-  line-height:1.1;
-  padding:4px;
-  display:inline-block;
+  line-height:1.15;
+  padding:6px;
 }
 
 pre{
@@ -64,7 +72,6 @@ pre{
 }
 
 </style>
-
 </head>
 
 <body>
@@ -72,17 +79,22 @@ pre{
 <pre>${ticket}</pre>
 
 <script>
-window.onload = () => {
+window.focus();
+
+setTimeout(() => {
   window.print();
-  setTimeout(() => {
-    window.close();
-  }, 500);
-};
+}, 300);
+
+setTimeout(() => {
+  window.close();
+}, 1000);
 </script>
 
 </body>
 </html>
 `);
+
+    ventana.document.close();
   }
 
   return (
