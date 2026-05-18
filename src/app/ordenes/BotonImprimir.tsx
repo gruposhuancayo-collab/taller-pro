@@ -6,31 +6,6 @@ export default function BotonImprimir({
 
   function imprimir() {
 
-    const ticket = `
-${orden.codigo}    ${new Date(
-  orden.createdAt
-).toLocaleDateString()}
-
-CLIENTE:
-${orden.cliente?.nombre || ""}
-
-CEL:
-${orden.cliente?.celular || ""}
-
-EQUIPO:
-${orden.producto || ""}
-
-████████████████████████
-${orden.problema || ""}
-████████████████████████
-
-PRECIO: __________________
-
-OBS: ____________________
-
-_________________________
-
-`;
     const ventana = window.open(
       "",
       "PRINT",
@@ -61,14 +36,31 @@ body{
   font-family: monospace;
   font-size:18px;
   font-weight:bold;
-  line-height:1.15;
+  line-height:1.1;
   padding:6px;
 }
 
-pre{
-  margin:0;
-  white-space:pre-wrap;
+.contenido{
+  width:100%;
+}
+
+.texto{
+  margin-top:2px;
+  margin-bottom:2px;
+}
+
+.problema{
+  margin-top:4px;
+  margin-bottom:4px;
+  background:black;
+  color:white;
+  padding:4px;
+  font-weight:bold;
   word-break:break-word;
+}
+
+.linea{
+  margin-top:6px;
 }
 
 </style>
@@ -76,9 +68,46 @@ pre{
 
 <body>
 
-<pre>${ticket}</pre>
+<div class="contenido">
+
+<div class="texto">
+${orden.codigo} - ${new Date(
+      orden.createdAt
+    ).toLocaleDateString()}
+</div>
+
+<div class="texto">
+${orden.cliente?.nombre || ""}
+</div>
+
+<div class="texto">
+${orden.cliente?.celular || ""}
+</div>
+
+<div class="texto">
+${orden.producto || ""}
+</div>
+
+<div class="problema">
+${orden.problema || ""}
+</div>
+
+<div class="linea">
+PRECIO: ______________________
+</div>
+
+<div class="linea">
+OBS: _________________________
+</div>
+
+<div class="linea">
+______________________________
+</div>
+
+</div>
 
 <script>
+
 window.focus();
 
 setTimeout(() => {
@@ -88,6 +117,7 @@ setTimeout(() => {
 setTimeout(() => {
   window.close();
 }, 1000);
+
 </script>
 
 </body>
