@@ -1,9 +1,12 @@
+```tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function OrdenDetalle({ params }: any) {
+export default async function OrdenDetalle({
+  params,
+}: any) {
 
   const resolvedParams = await params;
 
@@ -17,6 +20,7 @@ export default async function OrdenDetalle({ params }: any) {
     where: { id },
     include: {
       cliente: true,
+      pagos: true,
     },
   });
 
@@ -24,7 +28,17 @@ export default async function OrdenDetalle({ params }: any) {
     return notFound();
   }
 
-  // ✅ WHATSAPP
+  // ✅ TOTAL PAGADO
+  const totalPagado =
+    orden.pagos?.reduce(
+      (acc, p) => acc + p.monto,
+      0
+    ) || 0;
+
+  const deuda =
+    (orden.precio || 0) - totalPagado;
+
+  // ✅ MENSAJE WHATSAPP
   const mensaje = `
 🛠️ SHINHWA REPAIR
 
@@ -137,18 +151,19 @@ Gracias por confiar en SHINHWA REPAIR 🔧
           </div>
 
           <div>
-            <strong>Pago:</strong>{" "}
-            {orden.pagado
-              ? "✅ PAGADO"
-              : "❌ PENDIENTE"}
+            <strong>Precio:</strong>{" "}
+            S/ {orden.precio || 0}
           </div>
 
-          {(orden.deuda || 0) > 0 && (
-            <div>
-              <strong>Deuda:</strong>{" "}
-              S/ {orden.deuda}
-            </div>
-          )}
+          <div>
+            <strong>Pagado:</strong>{" "}
+            S/ {totalPagado}
+          </div>
+
+          <div>
+            <strong>Deuda:</strong>{" "}
+            S/ {deuda}
+          </div>
         </div>
       </div>
 
@@ -156,6 +171,8 @@ Gracias por confiar en SHINHWA REPAIR 🔧
       <div
         style={{
           display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit,minmax(220px,1fr))",
           gap: 12,
           marginBottom: 20,
         }}
@@ -167,17 +184,24 @@ Gracias por confiar en SHINHWA REPAIR 🔧
             href={wa}
             target="_blank"
             style={{
-              background: "#16a34a",
-              padding: 16,
-              borderRadius: 12,
-              color: "white",
               textDecoration: "none",
-              textAlign: "center",
-              fontWeight: "bold",
-              fontSize: 18,
             }}
           >
-            🟢 Reenviar WhatsApp
+            <button
+              style={{
+                width: "100%",
+                background: "#16a34a",
+                color: "white",
+                padding: 16,
+                border: "none",
+                borderRadius: 12,
+                fontWeight: "bold",
+                fontSize: 16,
+                cursor: "pointer",
+              }}
+            >
+              🟢 Reenviar WhatsApp
+            </button>
           </a>
         )}
 
@@ -193,19 +217,20 @@ Gracias por confiar en SHINHWA REPAIR 🔧
           />
 
           <button
+            type="submit"
             style={{
               width: "100%",
               background: "#2563eb",
               color: "white",
-              border: "none",
               padding: 16,
+              border: "none",
               borderRadius: 12,
-              fontSize: 18,
               fontWeight: "bold",
+              fontSize: 16,
               cursor: "pointer",
             }}
           >
-            ✅ Marcar listo
+            ✅ Marcar LISTO
           </button>
         </form>
 
@@ -221,15 +246,16 @@ Gracias por confiar en SHINHWA REPAIR 🔧
           />
 
           <button
+            type="submit"
             style={{
               width: "100%",
               background: "#dc2626",
               color: "white",
-              border: "none",
               padding: 16,
+              border: "none",
               borderRadius: 12,
-              fontSize: 18,
               fontWeight: "bold",
+              fontSize: 16,
               cursor: "pointer",
             }}
           >
@@ -238,28 +264,27 @@ Gracias por confiar en SHINHWA REPAIR 🔧
         </form>
 
         {/* MARCAR PAGADO */}
-        {!orden.pagado && (
-          <form
-            action={`/api/orden/${orden.id}/pagado`}
-            method="POST"
+        <form
+          action={`/api/orden/${orden.id}/pagar`}
+          method="POST"
+        >
+          <button
+            type="submit"
+            style={{
+              width: "100%",
+              background: "#f59e0b",
+              color: "white",
+              padding: 16,
+              border: "none",
+              borderRadius: 12,
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "pointer",
+            }}
           >
-            <button
-              style={{
-                width: "100%",
-                background: "#f59e0b",
-                color: "white",
-                border: "none",
-                padding: 16,
-                borderRadius: 12,
-                fontSize: 18,
-                fontWeight: "bold",
-                cursor: "pointer",
-              }}
-            >
-              💳 Marcar pagado
-            </button>
-          </form>
-        )}
+            💰 Marcar pagado
+          </button>
+        </form>
 
       </div>
 
@@ -420,3 +445,4 @@ Gracias por confiar en SHINHWA REPAIR 🔧
     </div>
   );
 }
+```
