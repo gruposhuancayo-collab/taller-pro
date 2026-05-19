@@ -1,51 +1,76 @@
-```ts
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  context: any
+  { params }: { params: { id: string } }
 ) {
 
-  const id = Number(
-    context.params.id
-  );
+  try {
 
-  const orden =
-    await prisma.orden.findUnique({
-      where: { id },
-    });
+    const id = Number(params.id);
 
-  if (!orden) {
+    if (!id || isNaN(id)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "ID inválido",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const orden =
+      await prisma.orden.findUnique({
+        where: { id },
+      });
+
+    if (!orden) {
+      return NextResponse.redirect(
+        new URL("/ordenes", req.url)
+      );
+    }
+
+    const monto =
+      orden.deuda || orden.precio || 0;
+
+    if (monto > 0) {
+
+      await prisma.pago.create({
+        data: {
+          ordenId: id,
+          monto,
+          metodo: "EFECTIVO",
+        },
+      });
+
+      await prisma.orden.update({
+        where: { id },
+        data: {
+          deuda: 0,
+          fechaPago: new Date(),
+        },
+      });
+    }
+
     return NextResponse.redirect(
-      new URL("/ordenes", req.url)
+      new URL(`/ordenes/${id}`, req.url)
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Error servidor",
+      },
+      {
+        status: 500,
+      }
     );
   }
-
-  const monto =
-    orden.deuda || orden.precio || 0;
-
-  if (monto > 0) {
-
-    await prisma.pago.create({
-      data: {
-        ordenId: id,
-        monto,
-        metodo: "EFECTIVO",
-      },
-    });
-
-    await prisma.orden.update({
-      where: { id },
-      data: {
-        deuda: 0,
-        fechaPago: new Date(),
-      },
-    });
-  }
-
-  return NextResponse.redirect(
-    new URL(`/ordenes/${id}`, req.url)
-  );
 }
-```

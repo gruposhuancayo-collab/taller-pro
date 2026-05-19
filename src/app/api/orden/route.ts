@@ -30,16 +30,34 @@ async function subirImagen(file: File) {
 
 export async function POST(req: Request) {
   try {
+
     const data = await req.formData();
 
     const clienteId = Number(data.get("clienteId"));
-    const producto = String(data.get("producto") || "");
-    const marca = String(data.get("marca") || "");
-    const modelo = String(data.get("modelo") || "");
-    const serie = String(data.get("serie") || "");
-    const problema = String(data.get("problema") || "");
 
+    const producto = String(
+      data.get("producto") || ""
+    );
+
+    const marca = String(
+      data.get("marca") || ""
+    );
+
+    const modelo = String(
+      data.get("modelo") || ""
+    );
+
+    const serie = String(
+      data.get("serie") || ""
+    );
+
+    const problema = String(
+      data.get("problema") || ""
+    );
+
+    // VALIDAR
     if (!clienteId || !marca || !problema) {
+
       return NextResponse.json(
         {
           ok: false,
@@ -51,13 +69,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const cliente = await prisma.cliente.findUnique({
-      where: {
-        id: clienteId,
-      },
-    });
+    // CLIENTE
+    const cliente =
+      await prisma.cliente.findUnique({
+        where: {
+          id: clienteId,
+        },
+      });
 
     if (!cliente) {
+
       return NextResponse.json(
         {
           ok: false,
@@ -69,48 +90,64 @@ export async function POST(req: Request) {
       );
     }
 
-    // 📸 SUBIR FOTOS
+    // SUBIR FOTOS
     const fotos: string[] = [];
 
     for (const value of data.values()) {
+
       if (value instanceof File) {
+
         if (value.size > 0) {
-          const url = await subirImagen(value);
+
+          const url =
+            await subirImagen(value);
+
           fotos.push(url);
         }
       }
     }
 
-    const codigo = `ORD-${Date.now()}`;
+    // CÓDIGO ORDEN
+    const codigo =
+      `ORD-${Date.now()}`;
 
-    const orden = await prisma.orden.create({
-      data: {
-        clienteId,
-        producto,
-        marca,
-        modelo,
-        serie,
-        problema,
-        codigo,
-        estado: "RECIBIDO",
-        fotos,
-      },
-    });
+    // CREAR ORDEN
+    const orden =
+      await prisma.orden.create({
+        data: {
+          clienteId,
+          producto,
+          marca,
+          modelo,
+          serie,
+          problema,
+          codigo,
+          estado: "RECIBIDO",
+          fotos,
+        },
+      });
 
+    // RESPUESTA
     return NextResponse.json({
       ok: true,
+      id: orden.id,
       codigo: orden.codigo,
-      telefono: cliente.celular || "",
-      id: orden.id,      
+      telefono:
+        cliente.celular || "",
     });
 
   } catch (error) {
-    console.error("ERROR ORDEN:", error);
+
+    console.error(
+      "ERROR ORDEN:",
+      error
+    );
 
     return NextResponse.json(
       {
         ok: false,
-        error: "Error al guardar orden",
+        error:
+          "Error al guardar orden",
       },
       {
         status: 500,
