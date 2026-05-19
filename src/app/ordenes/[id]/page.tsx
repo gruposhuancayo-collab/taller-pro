@@ -1,4 +1,3 @@
-```tsx
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
@@ -38,9 +37,14 @@ export default async function OrdenDetalle({
   const deuda =
     (orden.precio || 0) - totalPagado;
 
+  // ✅ URL APP
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "https://taller-pro-beryl.vercel.app";
+
   // ✅ MENSAJE WHATSAPP
-  const mensaje = `
-🛠️ SHINHWA REPAIR
+  const mensaje =
+`🛠️ SHINHWA REPAIR
 
 📄 Orden:
 ${orden.codigo}
@@ -64,10 +68,9 @@ ${orden.serie || "-"}
 ${orden.estado || "-"}
 
 📷 Seguimiento:
-${process.env.NEXT_PUBLIC_APP_URL}/seguimiento/${orden.codigo}
+${appUrl}/seguimiento/${orden.codigo}
 
-Gracias por confiar en SHINHWA REPAIR 🔧
-`;
+Gracias por confiar en SHINHWA REPAIR 🔧`;
 
   const telefono =
     orden.cliente?.celular || "";
@@ -445,4 +448,3 @@ Gracias por confiar en SHINHWA REPAIR 🔧
     </div>
   );
 }
-```
