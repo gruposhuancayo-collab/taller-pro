@@ -7,27 +7,30 @@ export default async function OrdenDetalle({
   params,
 }: any) {
 
-  const resolvedParams = await params;
+  const resolvedParams =
+    await params;
 
-  const id = Number(resolvedParams.id);
+  const id = Number(
+    resolvedParams.id
+  );
 
   if (!id || isNaN(id)) {
     return notFound();
   }
 
-  const orden = await prisma.orden.findUnique({
-    where: { id },
-    include: {
-      cliente: true,
-      pagos: true,
-    },
-  });
+  const orden =
+    await prisma.orden.findUnique({
+      where: { id },
+      include: {
+        cliente: true,
+        pagos: true,
+      },
+    });
 
   if (!orden) {
     return notFound();
   }
 
-  // ✅ TOTAL PAGADO
   const totalPagado =
     orden.pagos?.reduce(
       (acc, p) => acc + p.monto,
@@ -35,48 +38,11 @@ export default async function OrdenDetalle({
     ) || 0;
 
   const deuda =
-    (orden.precio || 0) - totalPagado;
-
-  // ✅ URL APP
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ||
-    "https://taller-pro-beryl.vercel.app";
-
-  // ✅ MENSAJE WHATSAPP
-  const mensaje =
-`🛠️ SHINHWA REPAIR
-
-📄 Orden:
-${orden.codigo}
-
-👤 Cliente:
-${orden.cliente?.nombre || "-"}
-
-💻 Equipo:
-${orden.producto || "-"}
-
-🏷️ Marca:
-${orden.marca || "-"}
-
-🧩 Modelo:
-${orden.modelo || "-"}
-
-🔢 Serie:
-${orden.serie || "-"}
-
-📋 Estado:
-${orden.estado || "-"}
-
-📷 Seguimiento:
-${appUrl}/seguimiento/${orden.codigo}
-
-Gracias por confiar en SHINHWA REPAIR 🔧`;
+    (orden.precio || 0) -
+    totalPagado;
 
   const telefono =
     orden.cliente?.celular || "";
-
-  const wa =
-    `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`;
 
   return (
     <div
@@ -116,16 +82,6 @@ Gracias por confiar en SHINHWA REPAIR 🔧`;
           <div>
             <strong>Cliente:</strong>{" "}
             {orden.cliente.nombre}
-          </div>
-
-          <div>
-            <strong>DNI:</strong>{" "}
-            {orden.cliente.dni}
-          </div>
-
-          <div>
-            <strong>Celular:</strong>{" "}
-            {orden.cliente.celular}
           </div>
 
           <div>
@@ -181,14 +137,11 @@ Gracias por confiar en SHINHWA REPAIR 🔧`;
         }}
       >
 
-        {/* WHATSAPP */}
+        {/* REENVIAR */}
         {telefono && (
           <a
-            href={wa}
+            href={`https://wa.me/51${telefono}`}
             target="_blank"
-            style={{
-              textDecoration: "none",
-            }}
           >
             <button
               style={{
@@ -203,91 +156,145 @@ Gracias por confiar en SHINHWA REPAIR 🔧`;
                 cursor: "pointer",
               }}
             >
-              🟢 Reenviar WhatsApp
+              🟢 WhatsApp
             </button>
           </a>
         )}
 
-        {/* MARCAR LISTO */}
-        <form
-          action={`/api/orden/${orden.id}/estado`}
-          method="POST"
-        >
-          <input
-            type="hidden"
-            name="estado"
-            value="LISTO"
-          />
+        {/* LISTO */}
+        <button
+          onClick={() => {
 
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              background: "#2563eb",
-              color: "white",
-              padding: 16,
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          >
-            ✅ Marcar LISTO
-          </button>
-        </form>
+            const reparacion =
+              prompt(
+                "¿Qué reparación se realizó?"
+              );
+
+            if (!reparacion) return;
+
+            const precio =
+              prompt(
+                "¿Cuánto costará?"
+              );
+
+            if (!precio) return;
+
+            const mensaje =
+`🛠️ SHINHWA REPAIR
+
+Hola ${orden.cliente.nombre} 👋
+
+Tu equipo ya está LISTO ✅
+
+🔧 Reparación:
+${reparacion}
+
+💰 Total:
+S/ ${precio}
+
+📍 Puedes pasar a recogerlo.
+
+Gracias 🔧`;
+
+            window.open(
+              `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`,
+              "_blank"
+            );
+
+            fetch(
+              `/api/orden/${orden.id}/estado`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                body: JSON.stringify({
+                  estado: "LISTO",
+                  reparacion,
+                  precio:
+                    Number(precio),
+                }),
+              }
+            ).then(() => {
+              location.reload();
+            });
+
+          }}
+          style={{
+            width: "100%",
+            background: "#2563eb",
+            color: "white",
+            padding: 16,
+            border: "none",
+            borderRadius: 12,
+            fontWeight: "bold",
+            fontSize: 16,
+            cursor: "pointer",
+          }}
+        >
+          ✅ Marcar LISTO
+        </button>
 
         {/* NO REPARADO */}
-        <form
-          action={`/api/orden/${orden.id}/estado`}
-          method="POST"
-        >
-          <input
-            type="hidden"
-            name="estado"
-            value="NO REPARADO"
-          />
+        <button
+          onClick={() => {
 
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              background: "#dc2626",
-              color: "white",
-              padding: 16,
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          >
-            ❌ No se pudo reparar
-          </button>
-        </form>
+            const motivo =
+              prompt(
+                "¿Por qué no se pudo reparar?"
+              );
 
-        {/* MARCAR PAGADO */}
-        <form
-          action={`/api/orden/${orden.id}/pagar`}
-          method="POST"
+            if (!motivo) return;
+
+            const mensaje =
+`Hola ${orden.cliente.nombre} 👋
+
+No se pudo reparar el equipo ❌
+
+Motivo:
+${motivo}
+
+SHINHWA REPAIR`;
+
+            window.open(
+              `https://wa.me/51${telefono}?text=${encodeURIComponent(mensaje)}`,
+              "_blank"
+            );
+
+            fetch(
+              `/api/orden/${orden.id}/estado`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                body: JSON.stringify({
+                  estado:
+                    "NO REPARADO",
+                  motivo,
+                }),
+              }
+            ).then(() => {
+              location.reload();
+            });
+
+          }}
+          style={{
+            width: "100%",
+            background: "#dc2626",
+            color: "white",
+            padding: 16,
+            border: "none",
+            borderRadius: 12,
+            fontWeight: "bold",
+            fontSize: 16,
+            cursor: "pointer",
+          }}
         >
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              background: "#f59e0b",
-              color: "white",
-              padding: 16,
-              border: "none",
-              borderRadius: 12,
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          >
-            💰 Marcar pagado
-          </button>
-        </form>
+          ❌ No reparado
+        </button>
 
       </div>
 
@@ -297,8 +304,6 @@ Gracias por confiar en SHINHWA REPAIR 🔧`;
           background: "#111827",
           padding: 20,
           borderRadius: 16,
-          marginBottom: 20,
-          border: "1px solid #374151",
         }}
       >
         <h2
@@ -314,135 +319,10 @@ Gracias por confiar en SHINHWA REPAIR 🔧`;
           style={{
             fontSize: 18,
             whiteSpace: "pre-wrap",
-            lineHeight: 1.6,
           }}
         >
           {orden.problema}
         </div>
-      </div>
-
-      {/* GALERÍA */}
-      <div
-        style={{
-          background: "#111827",
-          padding: 20,
-          borderRadius: 16,
-          border: "1px solid #374151",
-        }}
-      >
-        <h2
-          style={{
-            fontSize: 26,
-            marginBottom: 20,
-          }}
-        >
-          📸 Fotos del equipo
-        </h2>
-
-        {!orden.fotos || orden.fotos.length === 0 ? (
-          <div
-            style={{
-              fontSize: 18,
-              opacity: 0.7,
-            }}
-          >
-            No hay fotos registradas
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fit,minmax(220px,1fr))",
-              gap: 20,
-            }}
-          >
-            {orden.fotos.map(
-              (
-                foto: string,
-                index: number
-              ) => (
-                <div
-                  key={index}
-                  style={{
-                    background: "#1f2937",
-                    borderRadius: 16,
-                    overflow: "hidden",
-                    border:
-                      "1px solid #374151",
-                  }}
-                >
-                  <a
-                    href={foto}
-                    target="_blank"
-                  >
-                    <img
-                      src={foto}
-                      alt={`foto-${index}`}
-                      style={{
-                        width: "100%",
-                        height: 250,
-                        objectFit: "cover",
-                        display: "block",
-                        cursor: "zoom-in",
-                      }}
-                    />
-                  </a>
-
-                  <div
-                    style={{
-                      padding: 12,
-                    }}
-                  >
-                    <a
-                      href={foto}
-                      target="_blank"
-                      style={{
-                        display: "block",
-                        textAlign: "center",
-                        background: "#2563eb",
-                        color: "white",
-                        padding: 12,
-                        borderRadius: 10,
-                        textDecoration:
-                          "none",
-                        fontWeight: "bold",
-                        fontSize: 16,
-                      }}
-                    >
-                      🔍 Ver foto completa
-                    </a>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* VOLVER */}
-      <div
-        style={{
-          marginTop: 30,
-        }}
-      >
-        <a
-          href="/ordenes"
-          style={{
-            display: "block",
-            width: "100%",
-            textAlign: "center",
-            background: "#16a34a",
-            padding: 18,
-            borderRadius: 14,
-            color: "white",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: 20,
-          }}
-        >
-          ← Volver a órdenes
-        </a>
       </div>
 
     </div>

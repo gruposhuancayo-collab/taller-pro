@@ -10,25 +10,28 @@ export async function POST(
   }
 ) {
 
-  const params = await context.params;
+  const params =
+    await context.params;
 
   const id = Number(params.id);
 
-  const formData =
-    await req.formData();
-
-  const estado = String(
-    formData.get("estado")
-  );
+  const body =
+    await req.json();
 
   await prisma.orden.update({
     where: { id },
     data: {
-      estado,
+      estado: body.estado,
+      reparacion:
+        body.reparacion || null,
+      precio:
+        body.precio || null,
+      motivoNoReparado:
+        body.motivo || null,
     },
   });
 
-  return NextResponse.redirect(
-    new URL(`/ordenes/${id}`, req.url)
-  );
+  return NextResponse.json({
+    ok: true,
+  });
 }
